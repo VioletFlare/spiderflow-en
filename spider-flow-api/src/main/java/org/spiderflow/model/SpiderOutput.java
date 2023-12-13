@@ -6,22 +6,22 @@ import java.util.List;
 public class SpiderOutput {
 	
 	/**
-	 * 节点名称
+	 * Question Name
 	 */
 	private String nodeName;
 	
 	/**
-	 * 节点Id
+	 * 15th LastId
 	 */
 	private String nodeId;
 	
 	/**
-	 * 输出项的名
+	 * Name of the output item
 	 */
 	private List<String> outputNames = new ArrayList<>();
 	
 	/**
-	 * 输出项的值
+	 * Value of the output variable
 	 */
 	private List<Object> values = new ArrayList<>();
 

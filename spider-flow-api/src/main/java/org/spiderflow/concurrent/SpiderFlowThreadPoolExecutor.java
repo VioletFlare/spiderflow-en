@@ -8,17 +8,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SpiderFlowThreadPoolExecutor {
 
 	/**
-	 * 最大线程数
+	 * Maximum number of threads
 	 */
 	private int maxThreads;
 
 	/**
-	 * 真正线程池
+	 * Threads
 	 */
 	private ThreadPoolExecutor executor;
 
 	/**
-	 * 线程number计数器
+	 * ThreadnumberCounter
 	 */
 	private final AtomicInteger poolNumber = new AtomicInteger(1);
 
@@ -28,16 +28,16 @@ public class SpiderFlowThreadPoolExecutor {
 	private static final ThreadGroup SPIDER_FLOW_THREAD_GROUP = new ThreadGroup("spider-flow-group");
 
 	/**
-	 * 线程名称前缀
+	 * Thread name prefix
 	 */
 	private static final String THREAD_POOL_NAME_PREFIX = "spider-flow-";
 
 	public SpiderFlowThreadPoolExecutor(int maxThreads) {
 		super();
 		this.maxThreads = maxThreads;
-		//创建线程池实例
+		//Thread pool instance
 		this.executor = new ThreadPoolExecutor(maxThreads, maxThreads, 10, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), runnable -> {
-			//重写线程名称
+			//Rewrite the thread name
 			return new Thread(SPIDER_FLOW_THREAD_GROUP, runnable, THREAD_POOL_NAME_PREFIX + poolNumber.getAndIncrement());
 		});
 	}
@@ -48,8 +48,8 @@ public class SpiderFlowThreadPoolExecutor {
 
 
 	/**
-	 * 创建子线程池
-	 * @param threads	线程池大小
+	 * Create child thread pool
+	 * @param threads	Thread pool size
 	 * @return
 	 */
 	public SubThreadPoolExecutor createSubThreadPoolExecutor(int threads,ThreadSubmitStrategy submitStrategy){
@@ -57,32 +57,32 @@ public class SpiderFlowThreadPoolExecutor {
 	}
 
 	/**
-	 * 子线程池
+	 * Threads
 	 */
 	public class SubThreadPoolExecutor{
 
 		/**
-		 * 线程池大小
+		 * Thread pool size
 		 */
 		private int threads;
 
 		/**
-		 * 正在执行中的任务
+		 * In progress
 		 */
 		private Future<?>[] futures;
 
 		/**
-		 * 执行中的数量
+		 * Quantity in execution
 		 */
 		private AtomicInteger executing = new AtomicInteger(0);
 
 		/**
-		 * 是否运行中
+		 * Are you running
 		 */
 		private volatile boolean running = true;
 
 		/**
-		 * 是否提交任务中
+		 * Are you submitting a task
 		 */
 		private volatile boolean submitting = false;
 
@@ -96,14 +96,14 @@ public class SpiderFlowThreadPoolExecutor {
 		}
 		
 		/**
-		 * 等待所有线程执行完毕
+		 * Wait for all threads to finish
 		 */
 		public void awaitTermination(){
 			while(executing.get() > 0){
 				removeDoneFuture();
 			}
 			running = false;
-			//当停止时,唤醒提交任务线程使其结束
+			//When finished,Wake up the submitter to make it quit
 			synchronized (submitStrategy){
 				submitStrategy.notifyAll();
 			}
@@ -119,7 +119,7 @@ public class SpiderFlowThreadPoolExecutor {
 		}
 
 		/**
-		 * 清除已完成的任务
+		 * Delete completed tasks
 		 */
 		private void removeDoneFuture(){
 			for (int i = 0; i < threads; i++) {
@@ -128,13 +128,13 @@ public class SpiderFlowThreadPoolExecutor {
 						futures[i] = null;
 					}
 				} catch (Throwable t) {
-					//忽略异常
+					//Ignore exception
 				} 
 			}
 		}
 
 		/**
-		 * 等待有空闲线程
+		 * Wait for a free thread
 		 */
 		private void await(){
 			while(index() == -1){
@@ -143,7 +143,7 @@ public class SpiderFlowThreadPoolExecutor {
 		}
 
 		/**
-		 * 异步提交任务
+		 * Special thanks to:
 		 */
 		public <T> Future<T> submitAsync(Runnable runnable, T value, SpiderNode node){
 			SpiderFutureTask<T> future = new SpiderFutureTask<>(()-> {
@@ -151,19 +151,19 @@ public class SpiderFlowThreadPoolExecutor {
 					//执行任务
 					runnable.run();
 				} finally {
-					//正在执行的线程数-1
+					//Threads currently executing-1
 					executing.decrementAndGet();
 				}
 			}, value,node,this);
 
 			submitStrategy.add(future);
-			//如果是第一次调用submitSync方法，则启动提交任务线程
+			//If it is the first time you callsubmitSyncMethod，Submit a bug report using Bug Buddy
 			if(!submitting){
 				submitting = true;
 				CompletableFuture.runAsync(this::submit);
 			}
 			synchronized (submitStrategy){
-				//通知继续从集合中取任务提交到线程池中
+				//Notify that the task has been taken from the pool and submitted to the collector
 				submitStrategy.notifyAll();
 
 			}
@@ -174,22 +174,22 @@ public class SpiderFlowThreadPoolExecutor {
 			while(running){
 				try {
 					synchronized (submitStrategy){
-						//如果集合是空的，则等待提交
+						//If the collection is empty，Please wait while submitting
 						if(submitStrategy.isEmpty()){
-							submitStrategy.wait();	//等待唤醒
+							submitStrategy.wait();	//Please wait
 						}
 					}
-					//当该线程被唤醒时，把集合中所有任务都提交到线程池中
+					//When this thread is woken，Submit all tasks in the queue to the thread pool
 					while(!submitStrategy.isEmpty()){
-						//从提交策略中获取任务提交到线程池中
+						//Submit to thread pool from submit strategy
 						SpiderFutureTask<?> futureTask = submitStrategy.get();
-						//如果没有空闲线程且在线程池中提交，则直接运行
+						//If there are no free threads and the queue is submitted，Then run directly
 						if(index() == -1 && Thread.currentThread().getThreadGroup() == SPIDER_FLOW_THREAD_GROUP){
 							futureTask.run();
 						}else{
-							//等待有空闲线程时在提交
+							//Submit when a free thread is available
 							await();
-							//提交任务至线程池中
+							//Submit Task to Queue
 							futures[index()] = executor.submit(futureTask);
 						}
 					}

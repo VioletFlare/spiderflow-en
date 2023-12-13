@@ -5,12 +5,12 @@ import org.spiderflow.context.SpiderContext;
 public interface SpiderListener {
 
 	/**
-	 * 开始执行之前
+	 * Before we get started,
 	 */
 	void beforeStart(SpiderContext context);
 	
 	/**
-	 * 执行完毕之后
+	 * After you have finished
 	 */
 	void afterEnd(SpiderContext context);
 	

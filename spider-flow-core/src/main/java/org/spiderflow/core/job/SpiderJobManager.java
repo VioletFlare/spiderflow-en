@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /**
- * 爬虫定时执行管理
+ * Scheduled Tasks
  * @author Administrator
  *
  */
@@ -36,7 +36,7 @@ public class SpiderJobManager {
 	private SpiderJob spiderJob;
 	
 	/**
-	 * 调度器
+	 * Scheduler
 	 */
 	@Autowired
 	private Scheduler scheduler;
@@ -50,8 +50,8 @@ public class SpiderJobManager {
 	}
 	
 	/**
-	 * 新建定时任务
-	 * @param spiderFlow 爬虫流程图
+	 * Create a new timed task
+	 * @param spiderFlow Crawling Log
 	 * @return boolean true/false
 	 */
 	public Date addJob(SpiderFlow spiderFlow){
@@ -65,7 +65,7 @@ public class SpiderJobManager {
 			
 			return scheduler.scheduleJob(job,trigger);
 		} catch (SchedulerException e) {
-			logger.error("创建定时任务出错",e);
+			logger.error("Create a new task",e);
 			return null;
 		}
 	}
@@ -81,7 +81,7 @@ public class SpiderJobManager {
 			scheduler.deleteJob(getJobKey(id));
 			return true;
 		} catch (SchedulerException e) {
-			logger.error("删除定时任务失败",e);
+			logger.error("Failed to delete scheduled task",e);
 			return false;
 		}
 	}

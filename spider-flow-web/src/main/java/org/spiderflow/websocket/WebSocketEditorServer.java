@@ -14,7 +14,7 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 /**
- * WebSocket通讯编辑服务
+ * WebSocketCommunication Editor Service
  *
  * @author Administrator
  */

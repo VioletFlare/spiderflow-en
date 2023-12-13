@@ -14,7 +14,7 @@ import org.spiderflow.model.SpiderNode;
 import org.springframework.stereotype.Component;
 
 /**
- * 函数执行器
+ * Function Executor
  * @author Administrator
  *
  */
@@ -32,10 +32,10 @@ public class FunctionExecutor implements ShapeExecutor{
 			String function = item.get(FUNCTION);
 			if(StringUtils.isNotBlank(function)){
 				try {
-					logger.debug("执行函数{}",function);
+					logger.debug("Answer Function{}",function);
 					ExpressionUtils.execute(function, variables);
 				} catch (Exception e) {
-					logger.error("执行函数{}失败,异常信息:{}",function,e);
+					logger.error("Answer Function{}Failure,Anomalous messages:{}",function,e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			}

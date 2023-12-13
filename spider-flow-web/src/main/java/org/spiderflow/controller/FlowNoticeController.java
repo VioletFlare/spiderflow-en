@@ -24,13 +24,13 @@ public class FlowNoticeController {
 	@RequestMapping("/save")
 	public JsonBean<FlowNotice> save(FlowNotice entity) {
 		if (StringUtils.isEmpty(entity.getId())) {
-			return new JsonBean<FlowNotice>(0, "流程id不能为空");
+			return new JsonBean<FlowNotice>(0, "流程idCannot be empty");
 		}
 		try {
 			flowNoticeService.saveOrUpdate(entity);
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
-			return new JsonBean<FlowNotice>(0, e.getMessage() == null ? "发生错误" : e.getMessage());
+			return new JsonBean<FlowNotice>(0, e.getMessage() == null ? "There was an error." : e.getMessage());
 		}
 		return new JsonBean<FlowNotice>(entity);
 	}

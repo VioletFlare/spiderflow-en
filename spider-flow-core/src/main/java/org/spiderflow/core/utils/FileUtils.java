@@ -8,7 +8,7 @@ import java.io.*;
 import java.net.*;
 
 /**
- * 文件处理工具类
+ * File Management Tools
  * 
  * @author ruoyi
  */
@@ -19,10 +19,10 @@ public class FileUtils
     public static String FILENAME_PATTERN = "[a-zA-Z0-9_\\-\\|\\.\\u4e00-\\u9fa5]+";
 
     /**
-     * 输出指定文件的byte数组
+     * Output version informationbyteThe following text is a sample answer to the question "What is your name?":My name is John Doe.
      * 
-     * @param filePath 文件路径
-     * @param os 输出流
+     * @param filePath File Path
+     * @param os Output stream
      * @return
      */
     public static void writeBytes(String filePath, OutputStream os) throws IOException
@@ -75,16 +75,16 @@ public class FileUtils
     }
 
     /**
-     * 删除文件
+     * Remove Files
      * 
-     * @param filePath 文件
+     * @param filePath Files
      * @return
      */
     public static boolean deleteFile(String filePath)
     {
         boolean flag = false;
         File file = new File(filePath);
-        // 路径为文件且不为空则进行删除
+        // Delete the given paths if they are not already deleted.
         if (file.isFile() && file.exists())
         {
             file.delete();
@@ -94,10 +94,10 @@ public class FileUtils
     }
 
     /**
-     * 文件名称验证
+     * File name verification
      * 
-     * @param filename 文件名称
-     * @return true 正常 false 非法
+     * @param filename File name
+     * @return true Normal false Illegal
      */
     public static boolean isValidFilename(String filename)
     {
@@ -105,11 +105,11 @@ public class FileUtils
     }
 
     /**
-     * 下载文件名重新编码
+     * Download file name recode
      * 
-     * @param request 请求对象
-     * @param fileName 文件名
-     * @return 编码后的文件名
+     * @param request Request Object
+     * @param fileName File name
+     * @return File name after encoding
      */
     public static String setFileDownloadHeader(HttpServletRequest request, String fileName)
             throws UnsupportedEncodingException
@@ -124,7 +124,7 @@ public class FileUtils
         }
         else if (agent.contains("Firefox"))
         {
-            // 火狐浏览器
+            // Firefox
             filename = new String(fileName.getBytes(), "ISO8859-1");
         }
         else if (agent.contains("Chrome"))
@@ -134,21 +134,21 @@ public class FileUtils
         }
         else
         {
-            // 其它浏览器
+            // Other Browsers
             filename = URLEncoder.encode(filename, "utf-8");
         }
         return filename;
     }
 
     /**
-     * 文件下载状态
+     * Downloading started
      */
     public enum DownloadStatus {
-        URL_ERROR(1, "URL错误"),
-        FILE_EXIST(2,"文件存在"),
-        TIME_OUT(3,"连接超时"),
-        DOWNLOAD_FAIL(4,"下载失败"),
-        DOWNLOAD_SUCCESS(5,"下载成功");
+        URL_ERROR(1, "URLThe text you entered is not valid. Please correct it and try again."),
+        FILE_EXIST(2,"File Exists"),
+        TIME_OUT(3,"Connection timed out"),
+        DOWNLOAD_FAIL(4,"Download failed"),
+        DOWNLOAD_SUCCESS(5,"Download started");
 
         private int code;
 
@@ -190,7 +190,7 @@ public class FileUtils
             String urlPath = urlfile.getPath();
             fileName = urlPath.substring(urlPath.lastIndexOf("/") + 1);
         } catch (MalformedURLException e) {
-            logger.error("URL异常", e);
+            logger.error("URL1 hour before appointment", e);
             return DownloadStatus.URL_ERROR;
         }
         File path = new File(savePath);
@@ -202,16 +202,16 @@ public class FileUtils
             if (downNew) {
                 file.delete();
             } else {
-                logger.info("文件已存在不重新下载！");
+                logger.info("The file already exists. Do not download it again.！");
                 return DownloadStatus.FILE_EXIST;
             }
         }
         try {
             httpUrl = (HttpURLConnection) urlfile.openConnection();
             httpUrl.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0");
-            //读取超时时间
+            //Accessibility Support
             httpUrl.setReadTimeout(60000);
-            //连接超时时间
+            //Connection timed out
             httpUrl.setConnectTimeout(60000);
             httpUrl.connect();
             bis = new BufferedInputStream(httpUrl.getInputStream());
@@ -222,16 +222,16 @@ public class FileUtils
             while ((len = bis.read(b)) != -1) {
                 bos.write(b, 0, len);
             }
-            logger.info("远程文件下载成功:" + fileUrl);
+            logger.info("Remote file download successful:" + fileUrl);
             bos.flush();
             bis.close();
             httpUrl.disconnect();
             return DownloadStatus.DOWNLOAD_SUCCESS;
         } catch (SocketTimeoutException e) {
-            logger.error("读取文件超时", e);
+            logger.error("Read file timed out", e);
             return DownloadStatus.TIME_OUT;
         } catch (Exception e) {
-            logger.error("远程文件下载失败", e);
+            logger.error("Failed to download remote file.", e);
             return DownloadStatus.DOWNLOAD_FAIL;
         } finally {
             try {
@@ -242,7 +242,7 @@ public class FileUtils
                     bos.close();
                 }
             } catch (Exception e) {
-                logger.error("下载出错", e);
+                logger.error("Download error", e);
             }
         }
     }

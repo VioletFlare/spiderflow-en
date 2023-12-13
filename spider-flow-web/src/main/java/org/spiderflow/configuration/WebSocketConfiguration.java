@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 /**
- * 配置WebSocket
+ * Configure KSpread...WebSocket
  * @author Administrator
  *
  */

@@ -26,7 +26,7 @@ public class TaskController {
 	}
 
 	/**
-	 * 停止执行任务
+	 * Stop Operation
 	 * @param id
 	 * @return
 	 */
@@ -41,7 +41,7 @@ public class TaskController {
 
 	@RequestMapping("/remove")
 	public JsonBean<Boolean> remove(Integer id){
-		//删除任务记录之前先停止
+		//Stop before deleting the memo list
 		SpiderContext context = SpiderJob.getSpiderContext(id);
 		if(context != null){
 			context.setRunning(false);

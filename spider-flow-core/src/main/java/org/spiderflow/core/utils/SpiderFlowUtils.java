@@ -16,16 +16,16 @@ import org.springframework.util.CollectionUtils;
 import com.alibaba.fastjson.JSON;
 
 /**
- * 爬虫流程图工具类
+ * Bugzilla To-do List Assistant
  * @author jmxd
  *
  */
 public class SpiderFlowUtils {
 	
 	/**
-	 * 加载流程图
-	 * @param xmlString string类型保存的XML流程图
-	 * @return SpiderNode 爬虫的开始节点
+	 * Loading process diagram
+	 * @param xmlString stringSave typeXMLProcess Diagram
+	 * @return SpiderNode The start node of the path
 	 */
 	public static SpiderNode loadXMLFromString(String xmlString){
 		Document document = Jsoup.parse(xmlString);
@@ -42,7 +42,7 @@ public class SpiderFlowUtils {
 			node.setNodeName(element.attr("value"));
 			node.setNodeId(nodeId);
 			nodeMap.put(nodeId, node);
-			if(element.hasAttr("edge")){	//判断是否是连线
+			if(element.hasAttr("edge")){	//Determine if a connection is established
 				edgeMap.put(nodeId, Collections.singletonMap(element.attr("source"), element.attr("target")));
 			} else if (jsonProperty != null && node.getStringJsonValue("shape") != null) {
 				if ("start".equals(node.getStringJsonValue("shape"))) {
@@ -53,7 +53,7 @@ public class SpiderFlowUtils {
 				firstNode = node;
 			}
 		}
-		//处理连线
+		//Answer calls
 		Set<String> edges = edgeMap.keySet();
 		for (String edgeId : edges) {
 			Set<Entry<String, String>> entries = edgeMap.get(edgeId).entrySet();
@@ -61,9 +61,9 @@ public class SpiderFlowUtils {
 			for (Entry<String, String> edge : entries) {
 				SpiderNode sourceNode = nodeMap.get(edge.getKey());
 				SpiderNode targetNode = nodeMap.get(edge.getValue());
-				//设置流转条件
+				//Set Condition
 				targetNode.setCondition(sourceNode.getNodeId(),edgeNode.getStringJsonValue("condition"));
-				//设置流转特性
+				//Set the properties of the transformation
 				targetNode.setExceptionFlow(sourceNode.getNodeId(),edgeNode.getStringJsonValue("exception-flow"));
 				targetNode.setTransmitVariable(sourceNode.getNodeId(),edgeNode.getStringJsonValue("transmit-variable"));
 				sourceNode.addNextNode(targetNode);
@@ -74,7 +74,7 @@ public class SpiderFlowUtils {
 	}
 	
 	/**
-	 * 提取配置的json属性
+	 * Extracting the files from "%s"jsonProperty
 	 */
 	@SuppressWarnings("unchecked")
 	private static Map<String,Object> getSpiderFlowJsonProperty(Element element){

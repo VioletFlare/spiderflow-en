@@ -14,10 +14,10 @@ function renderCodeMirror(){
 		$dom.attr("rendered",true)
 		var cm = CodeMirror(this,{
 			mode : 'spiderflow',	//语法
-			theme : 'idea',	//设置样式
+			theme : 'idea',	//Set Style
 			placeholder : $dom.attr("placeholder"),
 			value : $dom.attr('data-value') || '',
-			scrollbarStyle : 'null',	//隐藏滚动条
+			scrollbarStyle : 'null',	//Hide Scrollbars
 		});
 		initHint(cm);
 		codeMirrorInstances[$(this).attr('codemirror')] = cm;
@@ -130,9 +130,9 @@ function resizeSlideBar(){
 function validXML(callback){
 	var cell = editor.valid();
 	if(cell){
-		layui.layer.confirm("检测到有箭头未连接到节点上，是否处理？",{
-			title : '异常处理',
-			btn : ['处理','忽略'],
+		layui.layer.confirm("Checking for unconnected arrows，Are you sure you want to delete the meeting titled '{0}'?？",{
+			title : 'Anomaly Handling',
+			btn : ['Answer','忽略'],
 		},function(index){
 			layui.layer.close(index);
 			editor.selectCell(cell);
@@ -216,24 +216,24 @@ $(function(){
 		});
 	}
 	if (!mxClient.isBrowserSupported()){
-		layui.layer.msg('浏览器不支持!!');
+		layui.layer.msg('The assistant does not support this action!!');
 	}else{
 		editor = new SpiderEditor({
 			element : $('.editor-container')[0],
-			selectedCellListener : function(cell){	//选中节点后打开属性面板
+			selectedCellListener : function(cell){	//Open the properties panel after selecting a node
 				loadTemplate(cell,editor.getModel(),serializeForm);
 			}
 		});
-		//绑定工具条点击事件
+		//Binding Toolbar Click Events
 		bindToolbarClickAction(editor);
-		//加载图形
+		//Loading graphics
 		loadShapes(editor,$('.sidebar-container')[0]);
 		layui.form.on('checkbox',function(e){
 			serializeForm();
 		});
 		layui.table.on('tool',function(obj){
-			layui.layer.confirm('您确定要删除吗？',{
-				title : '删除'
+			layui.layer.confirm('Are you sure you want to delete the meeting titled '{0}'?？',{
+				title : '12'
 			},function(index) {
 				obj.del();
 				serializeForm();
@@ -241,7 +241,7 @@ $(function(){
 				layui.layer.close(index);
 			});
 		})
-		//节点名称输入框事件
+		//The node name entry field event
 		$("body").on("mousewheel",".layui-tab .layui-tab-title",function(e,delta){
 			var $dom = $(this);
 			var wheel = e.originalEvent.wheelDelta || -e.originalEvent.detail;
@@ -259,7 +259,7 @@ $(function(){
 			}
 			layui.layer.open({
 				type : 1,
-				title : '请输入'+$(this).prev().html()+'表达式',
+				title : 'Please enter'+$(this).prev().html()+'Answer',
 				content : $(this),
 				skin : 'codemirror',
 				area : '800px'
@@ -268,7 +268,7 @@ $(function(){
 			serializeForm();
 		}).on("click",".history-version li",function(){
 			var timestamp = $(this).data("timestamp");
-			layui.layer.confirm('你确定要恢复到该版本吗？',function(index){
+			layui.layer.confirm('Are you sure you want to restore this version?？',function(index){
 				layui.layer.close(index);
 				var layerIndex = layui.layer.load(1);
 				$.ajax({
@@ -282,7 +282,7 @@ $(function(){
 							version = timestamp;
 							editor.setXML(data.data);
 							layui.layer.close(layerIndex);
-							layui.layer.msg('恢复成功')
+							layui.layer.msg('Restore successful')
 						}else{
 							layui.layer.msg(data.message);
 						}
@@ -309,7 +309,7 @@ $(function(){
 							layui.laytpl($('#history-version-tmpl').html()).render(array,function(html){
 								layui.layer.open({
 									type : 1,
-									title : '历史版本',
+									title : 'History version',
 									id : 'history-revert',
 									shade : 0,
 									resize : false,
@@ -318,14 +318,14 @@ $(function(){
 								})
 							})
 						}else{
-							layui.layer.msg('暂无历史版本！');
+							layui.layer.msg('History！');
 						}
 					}else{
 						layui.layer.msg(data.message);
 					}
 				}
 			})
-		}).on("click",".table-row-add",function(){	//添加一行
+		}).on("click",".table-row-add",function(){	//Add a Row
 			serializeForm();
 			var tableId = $(this).attr('for');
 			var $table = $('#' + tableId);
@@ -336,19 +336,19 @@ $(function(){
 				data : data
 			});
 			renderCodeMirror();
-		}).on("click",".table-row-up",function(){	//上移
-			var current = $(this).parent().parent().parent(); //获取当前<tr>
-			var prev = current.prev();  //获取当前<tr>前一个元素
+		}).on("click",".table-row-up",function(){	//Down
+			var current = $(this).parent().parent().parent(); //Get current<tr>
+			var prev = current.prev();  //Get current<tr>前一个元素
 			if (current.index() > 0) {
-				current.insertBefore(prev); //插入到当前<tr>前一个元素前
+				current.insertBefore(prev); //Insert in current<tr>前一个元素前
 				serializeForm();
 			}
 			renderCodeMirror();
-		}).on("click",".table-row-down",function(){	//下移
-			var current = $(this).parent().parent().parent(); //获取当前<tr>
-			var next = current.next(); //获取当前<tr>后面一个元素
+		}).on("click",".table-row-down",function(){	//Reset
+			var current = $(this).parent().parent().parent(); //Get current<tr>
+			var next = current.next(); //Get current<tr>后面一个元素
 			if (next) {
-				current.insertAfter(next);  //插入到当前<tr>后面一个元素后面
+				current.insertAfter(next);  //Insert in current<tr>后面一个元素后面
 				serializeForm();
 			}
 			renderCodeMirror();
@@ -363,10 +363,10 @@ $(function(){
 			var data = getCellData(cellId,$table.data('keys').split(","));
 			layui.layer.open({
 				type : 1,
-				title : '请输入Cookie',
-				content : `<textarea id="cookies" name="cookies" placeholder="请输入Cookies，分号( ; )分隔Cookie，等于号( = )分隔name和value" autocomplete="off" class="layui-textarea"  lay-verify="required" style="height:250px"></textarea>`,
+				title : 'Please enterCookie',
+				content : `<textarea id="cookies" name="cookies" placeholder="Please enterCookies，Comma( ; )15thCookie，The equals sign( = )15thname和value" autocomplete="off" class="layui-textarea"  lay-verify="required" style="height:250px"></textarea>`,
 				area : '800px',
-				btn : ['关闭','设置'],
+				btn : ['Off','1 hour before appointment'],
 				btn2 : function(){
 					var cookieStr = $("#cookies").val();
 					var cookieArr = cookieStr.split(";");
@@ -376,7 +376,7 @@ $(function(){
 						var cookieItem = cookieArr[i];
 						var index = cookieItem.indexOf("=");
 						if (index < 0) {
-							layer.alert('cookie数据格式错误');
+							layer.alert('cookieData Format Error');
 							appendFlag = false;
 							return;
 						} else {
@@ -400,10 +400,10 @@ $(function(){
 			var data = getCellData(cellId,$table.data('keys').split(","));
 			layui.layer.open({
 				type : 1,
-				title : '请输入Header',
-				content : `<textarea id="headers" name="headers" placeholder="请输入Headers，一行一个，冒号( : )分割name和value" autocomplete="off" class="layui-textarea"  lay-verify="required" style="height:250px"></textarea>`,
+				title : 'Please enterHeader',
+				content : `<textarea id="headers" name="headers" placeholder="Please enterHeaders，One row of seats，Comma( : )分割name和value" autocomplete="off" class="layui-textarea"  lay-verify="required" style="height:250px"></textarea>`,
 				area : '800px',
-				btn : ['关闭','设置'],
+				btn : ['Off','1 hour before appointment'],
 				btn2 : function(){
 					var headerStr = $("#headers").val();
 					var headerArr = headerStr.split("\n");
@@ -412,7 +412,7 @@ $(function(){
 						var headerItem = headerArr[i];
 						var index = headerItem.indexOf(":");
 						if (index < 0) {
-							layer.alert('header数据格式错误');
+							layer.alert('headerData Format Error');
 							return;
 						} else {
 							data.push({
@@ -435,10 +435,10 @@ $(function(){
 			var data = getCellData(cellId,$table.data('keys').split(","));
 			layui.layer.open({
 				type : 1,
-				title : '请输入参数',
-				content : `<textarea id="paramters" name="paramters" placeholder="请输入参数，一行一个，冒号( : )、等号（ = ）、空格（  ）或tab（ \t ）分割name和value" autocomplete="off" class="layui-textarea"  lay-verify="required" style="height:250px"></textarea>`,
+				title : 'Please enter the parameters',
+				content : `<textarea id="paramters" name="paramters" placeholder="Please enter the parameters，One row of seats，Comma( : )、equals（ = ）、_Spelling Suggestions（  ）ortab（ \t ）分割name和value" autocomplete="off" class="layui-textarea"  lay-verify="required" style="height:250px"></textarea>`,
 				area : '800px',
-				btn : ['关闭','设置'],
+				btn : ['Off','1 hour before appointment'],
 				btn2 : function(){
 					var paramterStr = $("#paramters").val();
 					var paramterArr = paramterStr.split("\n");
@@ -460,7 +460,7 @@ $(function(){
 							}
 						}
 						if (index < 0) {
-							layer.alert('参数数据格式错误');
+							layer.alert('Parameter data format is wrong');
 							return;
 						} else {
 							data.push({
@@ -478,11 +478,11 @@ $(function(){
 			})
 		}).on("click",".editor-form-node .function-add",function(){
 			var index = $(".draggable").length;
-			$(this).parent().parent().before('<div id="function' + index + '" class="draggable" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close function-remove"></i><label class="layui-form-label">执行函数</label><div class="layui-input-block array" codemirror="function" placeholder="执行函数"></div></div></div>');
+			$(this).parent().parent().before('<div id="function' + index + '" class="draggable" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close function-remove"></i><label class="layui-form-label">Answer Function</label><div class="layui-input-block array" codemirror="function" placeholder="Answer Function"></div></div></div>');
 			renderCodeMirror();
 		}).on("click",".editor-form-node .cmd-add",function(){
 			var index = $(".draggable").length;
-			$(this).parent().parent().before('<div id="' + index + '" class="draggable" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close cmd-remove"></i><label class="layui-form-label">执行命令</label><div class="layui-input-block array" codemirror="cmd" placeholder="执行命令"></div></div></div>');
+			$(this).parent().parent().before('<div id="' + index + '" class="draggable" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close cmd-remove"></i><label class="layui-form-label">Execute Command</label><div class="layui-input-block array" codemirror="cmd" placeholder="Execute Command"></div></div></div>');
 			renderCodeMirror();
 		});
 		layui.form.on('select(bodyType)',function(e){
@@ -542,30 +542,30 @@ $(function(){
 		editor.onSelectedCell();
 	}
 	/**
-	 * 加载各种图形
+	 * Loading various graphics
 	 */
 	function loadShapes(editor,container){
-		//定义图形
+		//Definition
 		var shapes = [{
 			name : 'start',
-			title : '开始',
+			title : 'Start',
 			image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABwUlEQVRYR9WXz1XCQBDGv9GD3sSDkpvYAR2IHWAF0oFsBUIFGyoQK1ArECpQK8BjcsMbnj7fRsN7hPDcCRt87nl25jez828FinNq2d0TWAINAR4XhJkbmStUrImK7+WGZeNAMBOgkd8hMUqN9H11lMl5A/x4/1BUsiCOt4mCN0BkOYDgds0L4jIxMqkahX8EEHMGoFX0NOmLtxOVcyCy7EDwXFRA4iM1skzKKs/gRd+M+SJAuwTgKTXSrWI4v/MrQBTzDkCvzAgJkxqJawOILHsQOIDyQ5wnRt5rAWiOeCPEZu+I+8RIaWQ0QGtP4DreocBuCvtSeQDvna4VgGjEaxCDsnLTeOUpO3azJAM4sWzvf3vd8bwcRowYZgBRTFfjuzXuDBNTiSxbELgut/vjIrCpy9VNk4/y0ABZYmnGc2gA966q/lAHwDQx4p3QwQG0a1owADeaAYw/gcFf5cBkQVxpjGetOGQZklDvB6EB1BtSaAD1PyEIAIk3AeLEyFjbQYMAAKiUgHkSBhlG2vpfWUojywkEF9rwrcgTqg5YBGgReBXBUWUIYpgYcduU6ixXsmwXRLaEuk/Ima+WbRLQ2fgC+RzXgT1bPk8AAAAASUVORK5CYII=',
 			hidden : true,
 			defaultAdd : true
 		},{
 			name : 'request',
 			image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACbUlEQVRYR+2XTXLTQBCFX5sF7DALsHaYE+AbxD4ByQlITmDrBCQnGHMClBMkOUHMCRAnIOwU2JhdssCPamnkkmRJM5KTKqpgqryxpqe/7unpH0HHFRhOIXhPYCLARMUJxALEIM6TUFZdjhTfzS8NJ08EBsDUIbP6TYQ/Q4l9zvYCUKspuBBg6HMogbUQRz7ecAKo5QPBta/yHFAhNsTM5QknQLDkNwBjH8tr9twkC3nTJtsKEBgeQ/Cpp/JMjDhJQomazmgFGBleiuDdPgAkrm5DOewFECzJfZTnsslCGg1NPwSGYwqMCOJkLme54GMAvDI8HAjmG+Ljj1AuUwD754VVHCULORkaDp/ZRLOvF+6AeB3KuhRTWdI63rqmct8RBmgMnD5AJCZCLNO4JL7eA1OF2gKoxU+BlQje9lHgK1NUrjKl4OgMQcxsLVj6gFeV7wDYgDyF4IOPRXl0B4YrCA6cMsRZEsppcd/O8wgM/wP8Yx4YGWqiLOZ7rXxe1a9zEAI3yH5ZnSKuZJ902wNg56FImobLKVd7PveTAtAZgPgMYNszbrJesrz+hmeoHrh2JpUeHtgQR1oBXYno0QBAzKqNam2jMDJci+C5ywtdY+COeKEVsNUD+nFkqMVl/pAATa1ZrQfsEPLlIQHq7r+2GqYlOZsD0rGrbXW5Ah3f7olZ6xVUlWv9bqvzXgDEdwhe275hB6LcERUtt/18YBjpMFrnCSeA7fuKvWDVE1uAkqLKMJEeAGiVTC3JVxMAiV8CLIoDSV1DWooBLUqqpCpYVGjTtg4ZY03XJYBsTF8TiKrJJj8jhyAR3oaSNqh/AKendd/nwfiIAAAAAElFTkSuQmCC',
-			title : '开始抓取',
-			desc : '抓取静态HTML页面或者API接口，抓取结果存为resp变量中。<br/>支持方法参考命令提示。'
+			title : 'Start taking pictures',
+			desc : 'Fetch StaticHTMLOrAPIInterface，Save results asresp变量Human。<br/>Command Reference。'
 		},{
 			name : 'variable',
 			image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAgCAYAAACYTcH3AAACe0lEQVRYR+2WMW5TQRCGv0mEoMMUKK80J0joKJBITgCUVAkniLehjQ+A9GwugLlBboA5QZITYLpnaEwXkZhBs+xu1s8vkhMDMpItudh9szP//PPP7Aor9JMVwsLqgmmV2roD7W9OTpsYe1jqzgWMJk4m9e/FO30W986nnDXZ1P2bPzsT480ws9XTE4EdlNeVk0EesCj1AOE9MKw6smffzPk9oQQOGsAPz5WXOajcP4KB9+cUTrng6SyYUici3M8DxiDRkSpnYyc+o+TcHCpnAhOFlgjb4VwCbuuipxr2R0A7T0DhSR1MT4RDb6Q8qpzYIYpS2wif/bbixk56Ram7CB+D7QyTRanDkDlVR1KMDIz5/wAMfhp4aJvPGTBNQT0DpSaQ58oDo95KdBeslKOxk06eZW6Pslc5GdaYIfrJz811U8zK6jjuyOPgxFhpWzaVkxl9eN1sso2ya3+FHYFWCtIERvlUOdmt66wJTBSqL5UHcVWOlKUH2dcjVToxuCrfTW9+/Vug5mOemUXBhLJ4IavSD473Ub5UTpLosu7y9Z9CL7ZoUWoX4ehPgYkaGfnugFYUbuquUo9FeG7rXKQhmfRtaWZyIadBFoQb10WpA4T9vJu8fjY4ROlmmkmdlrrpJmUK7Zzas0m4Nj03hZO6CEP797MRkUSfgZlrBDt37d1kwTZgYIPMJmWcOXnwYNP1UxtsJtm/a7amKYWOQverk+OQoDF2MIUXTVfO6l6UTZT/y701M9exvWZmzcxNO3F1NbPV18OZt8hNU1vCXn/w9upJmD0tl/B566MqvKo/O+3umHuB3TrC4gdHesmb1dXM4on8Hcs1M//FBP4FX81QGwO29kEAAAAASUVORK5CYII=',
-			title : '定义变量',
-			desc : '定义流程变量。<br/>定义变量有先后顺序，先定义变量后续可以使用，拖动可以交换变量顺序。'
+			title : 'Define a variable',
+			desc : 'Define a process variable。<br/>Define a variable in the following order:，Define a variable first, then use it below，Drag to exchange variables。'
 		},{
 			name : 'loop',
 			image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADO0lEQVRYR9WWS2hTURCGvwnVlVjpzgdWxQeo0IWP7rQuRBQVFayLSlUQH5V2UWhzo4takOTGCF1UlOJCKyJiFxUFSwWxioguRBEV31qhVXeKSI3ajJybGxPTJDdpCtUDIeFmZv7vzpmZc4RxXjLO+vzHAH4tZZhySihzsih8JCTPCs1o/hlo0UlE2QlsA2YD0zOI3QV68dFBUD7kA+MN0KIT+U4zwg5gbkrQn8ArYELac2MyCJzClsNeELkB/DoT4SJQ6QZ6AZzFRw8TeEyr/HCeH9YyhqhEWAzUAbNc+26GaSIir7OBZAcIaCXKbaAEGAIaidJJm5jf2ZelRrwFnO0y6wlCNSF5mskpM0CdTmIyX12HAWLs4Khc90rnX/9bagBO/4FQ1hGW9+kxMgNYesEpNuUtw2zimDwqSDxhbOlupxbMUjoIyz5vAEuN0UnXqYawnB+VeBKiCTjqxjNZ6EmNNzIDlt4AqhDaCUlDUeJJiHNATaaYIwECuhClOp8WyhsuoOtRrjhta8u83BnIO2qBhpaq67EUW+4nvP/OgKWm55cBzdjSVaBEZnOzpcoUBDMlTX3tdVs0ii2rkgBx8a0pUcw2FA9h6QAwzZkHsCjlexBbpscBRoonOIqHCOhGlLNAacrLfUGoJSSXBUurAFP55kTrRylH+YwwBegzaSp6K/y6AnGG0hzgDcouwnIrLmmWXyP4uIk6J912FNP7gwjfxqwbDupiYrTjo56gPM5WhHuADicDMZYTkZdFv71HgPQuMMdtXFRpICztYwJgqSnuOpRDhOWO1yS8CqwFerBlXdEAAZ2PYg6yGUBr+paOnIR+rUXodIXbsKWxKIhkhw3gYwlB+eQ9Cf16HOGAa1iPLcdHBWHpEeCQ67sGW66lx8l+IUmdDUITITlWEERAT6Dsd326sWVLJv/cV7Lk/Da+ffiwCUpvTpD4wWO6aYNr14Ut1dl8vC+lliaKMh5DuYQP08cP8HEP5RcxKlAWIKxOETbWFraEcwF7Azhh1LyR+Szx3AYzQ+AMMTqJyEMv+/wAElEs3QxUACvdA2YqEAWeu/Oj3xG35Z2XcOZJmK/XGNoVloExFP5nMvAbItf8IXnK1DcAAAAASUVORK5CYII=',
-			title : '循环',
+			title : 'Special Characters',
 			desc : ''
 		},{
 			name : 'forkJoin',
@@ -576,27 +576,27 @@ $(function(){
 			name : 'comment',
 			image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAD/0lEQVRYR82WT2hcdRDHP9+XGL1YpaTZtzGEotX0UISSih78Uy8t2ksrVPBkVVBKafZtbNOjFUGIjdm3W0xVCjagXrSVglT0orQHlVrQIIoYK2hNXkwo0XowJdmR93Y3vt0k+3aDVn+w8Njf/GY+v5n5zYz4j5eate/6thu4C1gHdBjMCS4a/OSInx1x/pc+XWpUb0MA6bz1mvEkEBoPDddbM4gTBqNTGX2dBFIXIJW3TRTZL/H0MoquAt8jihTpQbTVyMwjjgUZ9dWDWBHAzdlWHN7C6IwUGOOI44Jxc/g26NM3ccWdvvUsQI+MjYh+IFXev6gieyb7dW45kGUB3JwdRjy3eMA4utDGi9P7FCS5NNyPYERBxraYjueDrA7Xnl8CkB62+8zhbOzgw0FWHzRiuFbGzdkAYjCm68Egq0/icksAXN9+AG4NhQJPDSVpEpzrm0UyYsJgezw5qwy4eStg7C/H/FCQ1UsrKe8csvZiC58i5lqL3H+pX5dXknVz9hDiTJRKxutTWT1TkV0E6Mrb7fMwhnGDiY+mMtpe72ZVeWIsG9/4eTdnBVS6nMSWyYwulJxSXjGFUw48MOHpuyTXpvL2powrgae9SbLrXjG35SrnEBuAkcDTvkWADQW7/g+Lbn8HcCDw9HKSwtXsuzk7gDgCTAeeOhYB3JztQLxfjv2STF3O2NqCrWkrcjrc+9PYNZvVbBJUeti2mcOHZblHA0/vRCFwc7YXMRJ+z8+xZuaQriQpiwqV+HgV0L+VdR8JPA1UAAYRA8CFwNOWJONl6KYBonO+fQXcCZwIPD1RAvDtJPBI7RNJeAWrAkj7dtzgKeBM4GlHBJDy7ZRg17UAcH0bAp6VOD2Z0c6KB6I/r0UI0r69bfAY4mjYKSseCD/y/3YSlsMdJu5WjINBVkMRQDpvoftPNZPRq3kFbs7WI34s29kdZPVuCcC3bgvLMNzUaCFaDUAqbxkZPjDT4rA5HN3+LsV5G8EIS2pDpbhZgKpSLIaCjA5W9YK0b/caRFNLg82oqWcYa0bzJjZXWnJVO0759p5gZzlGddtxMx6It2MgqoCVGlMF0FGw21TkC8HNoUC9gaRr2NbOO7yKEdDCC0GfplcqXIsDCXweeLonLrd0JIu/iCge/GMjmQMba9v8/28orbgnnGyLMArcXc6JceA1GWNzrXx2uU+/x13ZPmg3trbRi+gFwgyPxnKDWYn+IKM3lgtR4tDp+hbOhVmgtUbBmOB80VhQyWj4q1phbynCsemsvlwpPxIBomaVt02CxzH2AO1127WYoMhJOYxW5r568g0BVBTcUrCuhQXCLF6PQ7eg24zrgF/DMcvg7JSn0mTV4GoKoEGdTYn9Bf4L6DCOEiGKAAAAAElFTkSuQmCC',
 			title : '注释',
-			desc : '仅仅是注释,毫无作用'
+			desc : 'Just an observation.,毫无作用'
 		},{
 			name : 'output',
 			image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAByUlEQVRYR+WXwVHDMBBF/4YD3AgHwEd3QKiA0IE7IOnAqoCkAqWDmAqACggVJJTAzRku4UYOmWVWloMZgi17bGcGdNGMrZWeVtrdL4JtXc3dI8I9gH76rWIfxSENXW0pHehpHoAwdTXMHccYx4pGLnNlAUYg3BojxtjFODPGB+Hmmw1jGCuKiubZCRCHtP1eNIH89zT3QXgy7IwXIlzYjRRC1A7wwTg5BGauELUDiPfkQrtCNAIg7neFaAzAFaJRAIE41dzrJHfieNfFrB2gMGoYz7GibbL7GwAmjQO9vN0zMDGh2YQHCt2eJKsZCFf/F+A3L9VyCV2OQMLxgKA3DPWmaJHatAbgaTbVloHFmnG9UrQSiDYBfFlcEpL0y5AuWwWQxc40B51EdUkzyqmUB6xs0wB8l3PfNYaBHgFdqx1UKYCs8KgKkLVjYFUKwJbYKN1BFQjjga/CNC4FUGXBrI0NxbmtinexokFrAJ5mnwlz8Z7oxjXQl1BsEyDJA4z3NeC3ngeM+4HJBgj3kgn3XgvONRs9IOe/VBTuoxa46wEQnN51pcKSMTAZNEcR1fc4zSFjxuNSUfDjCKyuezCyqanGeN0AQTYKPgFOSUMAph/CYQAAAABJRU5ErkJggg==',
-			title : '输出',
-			desc : '输出流程中的变量结果（仅测试下有用）'
+			title : 'Output',
+			desc : 'Output流程HumanThe results of the survey（Only test if useful）'
 		},{
 			name : 'executeSql',
 			image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAD1ElEQVRYR7WXUXIaRxCGv4YqR2+WH2zxZukEUU5gdAKjExhfILAnMD7BohMYn8D4BEYnsHQCobfd5CHkDVIFnerZmc0sLAJjMlVUSbszPX93//13r7DnOk319JcGb0TpAOfRzyxMw0+F8WLF7SyR2T6mZdemVqrnCB+A7sZe5dE9E17X2BmhfMwSMXBb11YAzmPhg0DfnVYeFcYKkz8SGddZfJVqR6At0ClBCYP5ipttEakF4C//JnCpyt/AIE9kuCta8fuzVA34QITnCncL5aoOxAaAl6leNgS7/FSVrwvo7pvPdYDOERiJ8FZhtlKu/kzkLt5XAeA9f/CX3+SJFOH/yXWW6lCEnoFYKBexQyWAtbAf7fKAPQJRSUcJoNygfM0TsVI7+jpLdWzp8NUxKAoI8KX2YIRbwPmhOd+F2HNiasREubASDQBGCO9USdbZ3kq1TRPNfpfb9Qsc8CavWfIY17sRudnk+XzJ/bozrVQHTleUz1kiXTFUJ8JfVudZIqZwbjkjwhevePZoulSuA4tLQ36/wjDvS+IjOkF4g3KVJTKpAT41nZgrL8TEoyF8UaVCvFaqbpOVooEQ4Ver57wvv7moCN8sZVKIU8eH9X2WyKiV6i4ALuIr5VpaqZb/BIWLOHGfJ3LpvXKAsr7YGRdGM2Bn1p3YBSDstzSYMYfWDIdQBQ9RbrNE2h6A9YLzLJFBlEcX4vX9uwA4e0NVs28ASs/iXLkN1uWKPFYayrEAWErFI6kQ0IAEXbC/rQmJchMIdRQA3nEHIJCrhq0mFt2ysxXt9TgpKAFsSUElHakaiE+m5XlfXhwlAua4cl9LwjpFi8l6LACBhBtl6EUo9Wo1isUlLkMj6BJmTaHnUuWrZlcVVMqwTog8gO+BG14tv7syjHTApNuGFhMVF7X/OLK/EJVSDNOsLxdR+7wz9aukw+u3CZUrIWsq0QqTzwmMnRRXX8aaUpb+1mbkgMHQZNa3zfEc+qG5mPiY/juJLuR6YvPjEjoN6LrIrIGzAWejGfn82uT7UDex1BHy0GfxxFVpxx6E03cTnbwv14de8tS5iJxOT3xkiyN+WJj4kP5/I5lyv4B2SOXmUApuYon7+89GIxr3Niau+rHcCFWAGC+U94eOaD7nn+xDxWaHFbSfHMuDp5V0wAxhkPfk5kciYWxXoedH/ErYYztPfpqd2GdZ8V1oa2oRQZjkPbGy21he1N4CNkMU453ycQ7DH/o0iy276QisQgq1q64wJ5SzZPla+WznDv44Xb/J0vIM2o1CmEwJT4NSuq5mqYLpCsb/wGRf3vwLgODoY+vqQ1gAAAAASUVORK5CYII=',
 			title : '执行SQL',
-			desc : '执行sql，需配置数据源，sql执行结果存于变量rs中。<br/>语句类型为：select，返回:List&lt;Map&lt;String,Object&gt;&gt;<br/>语句类型为：selectOne，返回:Map&lt;String,Object&gt;<br/>语句类型为：selectInt，返回:Integer<br/>语句类型为：insert、update、delete，返回:int，批量操作返回int数组<br/>sql中变量必须用 # # 包裹，如：#${title}#'
+			desc : '执行sql，Please configure a data source，sqlSave result to variablersHuman。<br/>Please translate the following text to english:：select，Back:List&lt;Map&lt;String,Object&gt;&gt;<br/>Please translate the following text to english:：selectOne，Back:Map&lt;String,Object&gt;<br/>Please translate the following text to english:：selectInt，Back:Integer<br/>Please translate the following text to english:：insert、update、delete，Back:int，Bulk Operations ReturnintThe following text is a sample answer to the question "What is your name?":My name is John Doe.<br/>sqlVariable must be used # # 包裹，Like：#${title}#'
 		},{
 			name : 'function',
 			image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAAgCAYAAACPb1E+AAAC9UlEQVRYR+2YP0zUUBjAf9+RKJPgQK6THptxERPiZOTUxEUj/tlMjCS62xoT3YARl5bJTXByBGcHISQmxhjQ6A6TPRg8JrnE62de6Z0Htne9XhMw4W1N3/u+X7//rwJgzeokygRQMs+HYSksBsr0liNrYrk6gTB3GMBiGNZ9W4al6OqiCOOqfFGYKkD1oIEVRkRwQw5l2FhyCWEMZdp3ZOqgARv6LU/1CDIPbxxZMg8rhmUxj5gcdHWw6khiJSh6+lVgAGXMd2S90/79H9czpOXpd+CsKk7FEe8fBab2whwCdeF6n/ISOFUPuLT1RFbSWLsnSMvTOVUmREJVM74tz1uVGov1C6tR9/rs2zJqefoL6FfYDpSy6SKdQDNDGkAI2yeqvKk4ci/GilMIk40aZ1w95OpIQVgWOKFQDZTLnUAzQbYCorz2HQlhW5flakmFVYFBVWYrjtiN9yEoLIkwkAa0a0jL0x8m4SLrxAKGGenqPMIDVbZrUNqfWE1Qk1AFqAc83HLkVZzrs0AGgKhQDwJG41xluVpGeB99SGKLtTx9i3LTJFUAC5u23MkFcsjTZwWYFjie5CrLUwNYRtnwHYkd+fbENHyr/eZG9als5AJphLSLqdZxL1BubzqyGFP3mkmXFNN74jtrMW8FRdgB7u4EfGiWHGXZd6QcA7iCcBEz1yQkXa7F3ID2wUeEY0HATJ9wRoVxo6SunI+N18gqCu8qtlzrVCNzaYtFVx8BVwJ4UYB5Ec4pfKrYciEOoOiqjXC1ptxv10pzcXccQBQC5VqdhaQkSGO5XN2dRWGWM13XySxKej1zBNmrBRvnYy25fyDIS1kWOdG49zNqseG92xPhcSRsqWuhgoXSn3jOFH3F71Kuaatha91RTpp7d0lhzYxQXQra3W66yO4AHL86vW+nNOpOofgI9JaZAzOAmt80p9tAmgFivlu5Aaw1ZoB2Nkglt/kHJNmSsf08lfBoU2pIy9W/14JuNCTs9e3olpRC1n8B+Qd0Dhp9ddQMugAAAABJRU5ErkJggg==',
-			title : '执行函数',
-			desc : '单独执行函数方法，结果不保存为变量'
+			title : 'Answer Function',
+			desc : 'Individual funtions and methods，结果不保存为变量'
 		},{
 			name : 'process',
 			image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACMklEQVRYR+2WwXHTQBSGv+fMkNwIB7BvMRVgV0DoIFRAUoGlCpJUsKICnApCB4QKcCrAvslwwEebGfyYp2g1QgmytBmPOaCjtLv/t+/9+neFHT+yY31aAxw6PdwXzgVOgH5lA1OEcTqSy6Ybaw3QdZqIMKoTUOX9PJaoCUQIwEKEp7+U4fdYJmWR504He8IXYJpG8tK+9RJVP0ZhIkKSjuTKv9sOgDJLY8naUwYog6yUN4tYFq0Bek4vEM5ry6tcprFclMeYd57AcQcShCOrxjySYWsAWzTzgZlQOPoDRJkB46p4FeQAJtlc5SwIoIm56sa8cHrSEa4zTzx2sZD51o4D4YfN3QlAz2kf4evOAIoWKLetKxCShD2np2ksY9txXn7Lin6QCdsmoYkjfFgqz/Y7vBYlMXFVbuexDB6sQNdphPBOYOBNlkaSje06bZyEXrxqVBNfwfG9IMrL+6ksHASQJ2EVwIQFEt+OeybsOrWsfoUyW0P0E26MsryDtknoIXwFq9UoWmBlF8GZ+BIGVeHyxLZJWDZhHUC2+7Xy9lssH0MCJmROUQF/aplb63YfIlI3598B8AbcWQsKE8J0qQx9G3pO7Xg99WUMScJGLchD5u43hKkK0WrN5/zUGqeRnBV3gW3dCbPdwU0OUQXPINokYRPDPhjF9t8qWC5YNe4e5cpa0QigdCfcBLHxNMx+z1zcFmubhI8HqJiw8EHgnfCvSbiJdFvfN7ZgW8J+3f8AvwFIqFFyobd5IgAAAABJRU5ErkJggg==',
-			title : '子流程',
-			desc : '执行其他spiderFlow流程，父子流程变量共享'
+			title : 'Translation',
+			desc : 'Other actionsspiderFlow流程，Share process variables with child'
 		}];
 		var addShape = function(shape){
 			var image = new Image();
@@ -644,7 +644,7 @@ $(function(){
 });
 
 /**
- * 绑定工具条点击事件
+ * Binding Toolbar Click Events
  */
 function bindToolbarClickAction(editor){
 	$(".xml-container textarea").bind('input propertychange',function(){
@@ -693,7 +693,7 @@ function bindToolbarClickAction(editor){
 	}).on('click','.btn-debug',function(){
 		runSpider(true);
 	}).on('click',".btn-return",function(){
-		parent.openTab('爬虫列表','welcome','spiderList.html')
+		parent.openTab('Crawling List','welcome','spiderList.html')
 	}).on('click','.btn-save',function(){
 		Save();
 	}).on('click','.btn-dock-right',function(){
@@ -781,8 +781,8 @@ function runSpider(debug){
 			maxmin :true,
 			maxWidth : 700,
 			maxHeight : 400,
-			title : '测试窗口',
-			btn : ['关闭','显示/隐藏输出','显示/隐藏日志','停止'],
+			title : 'Test Window',
+			btn : ['Off','Answer/Hide Output','Answer/Hide Log','Stop'],
 			btn2 : function(){
 				var $output = $(".test-window-container .output-container");
 				var $log = $(".test-window-container .log-container");
@@ -837,7 +837,7 @@ function runSpider(debug){
 			},
 			btn4 : function(){
 				var $btn = $("#layui-layer" + testWindowIndex).find('.layui-layer-btn3');
-				if($btn.html() == '停止'){
+				if($btn.html() == 'Stop'){
 					socket.send(JSON.stringify({
 						eventType : 'stop'
 					}));
@@ -848,7 +848,7 @@ function runSpider(debug){
 						eventType : debug ? 'debug' : 'test',
 						message : editor.getXML()
 					}));
-					$btn.html('停止');
+					$btn.html('Stop');
 				}
 				return false;
 			},
@@ -877,11 +877,11 @@ function runSpider(debug){
 				LogViewer = new CanvasViewer({
 					element : logElement,
 					onClick : function(e){
-						onCanvasViewerClick(e,'日志');
+						onCanvasViewerClick(e,'Log');
 					}
 				});
 				$(layero).find(".layui-layer-btn")
-					.append('<div class="layui-inline"><input type="text" class="layui-input" placeholder="输入关键字过滤日志"/></div>')
+					.append('<div class="layui-inline"><input type="text" class="layui-input" placeholder="Log filter actions"/></div>')
 					.on("keyup","input",function(){
 						LogViewer.filter(this.value);
 					});
@@ -898,7 +898,7 @@ function runSpider(debug){
 						var message = event.message;
 						if(eventType == 'finish'){
 							$(".spiderflow-debug-tooltip").remove();
-							$("#layui-layer" + testWindowIndex).find('.layui-layer-btn3').html('重新开始');
+							$("#layui-layer" + testWindowIndex).find('.layui-layer-btn3').html('Restart');
 							$(".btn-stop,.btn-resume").addClass('disabled');
 							$(".btn-test,.btn-debug").removeClass('disabled')
 						}else if(eventType == 'output'){
@@ -909,7 +909,7 @@ function runSpider(debug){
 									index : 0
 								};
 								var $tab = $(".test-window-container .output-container .layui-tab")
-								var outputTitle = '输出-'+tableId;
+								var outputTitle = 'Output-'+tableId;
 								var cell = editor.getModel().cells[message.nodeId];
 								if(cell){
 									outputTitle = cell.value;
@@ -932,12 +932,12 @@ function runSpider(debug){
 										font : 'bold 13px Consolas'
 									},
 									onClick : function(e){
-										onCanvasViewerClick(e,'表格');
+										onCanvasViewerClick(e,'Form');
 									}
 								})
 								var cols = [];
 								var texts = [new CanvasText({
-									text : '序号',
+									text : 'Serial Number',
 									maxWidth : 100
 								})];
 								for(var i =0,len = message.outputNames.length;i<len;i++){
@@ -1089,7 +1089,7 @@ function bindTooltip(content,selector){
 	}
 
 }
-//最近点击打开的弹窗
+//Recent Clicked Open Windows
 var index;
 function onCanvasViewerClick(e,source){
 	var msg = e.text;
@@ -1137,7 +1137,7 @@ function createWebSocket(options){
 	socket.onopen = options.onopen;
 	socket.onmessage = options.onmessage;
 	socket.onerror = options.onerror || function(){
-		layer.layer.msg('WebSocket错误');
+		layer.layer.msg('WebSocketThe text you entered is not valid. Please correct it and try again.');
 	}
 	return socket;
 }
@@ -1151,11 +1151,11 @@ function Save(){
 			data : {
 				id : getQueryString('id') || flowId,
 				xml : editor.getXML(),
-				name : editor.graph.getModel().getRoot().data.get('spiderName') || '未定义名称',
+				name : editor.graph.getModel().getRoot().data.get('spiderName') || 'Definition',
 			},
 			success : function(id) {
 				flowId = id;
-				layui.layer.msg('保存成功', {
+				layui.layer.msg('Save successful', {
 					time : 800
 				}, function() {
 					// location.href = "spiderList.html";

@@ -10,12 +10,12 @@ import org.spiderflow.executor.FunctionExecutor;
 import org.springframework.stereotype.Component;
 
 /**
- * List 工具类 防止NPE 添加了类似python的split()方法 
+ * List Class Instance PreventNPE Added similarpython的split()Method 
  * @author Administrator
  *
  */
 @Component
-@Comment("list常用方法")
+@Comment("listCommon Methods")
 public class ListFunctionExecutor implements FunctionExecutor{
 	
 	@Override
@@ -23,7 +23,7 @@ public class ListFunctionExecutor implements FunctionExecutor{
 		return "list";
 	}
 
-	@Comment("获取list的长度")
+	@Comment("GetlistThe length of the text")
 	@Example("${list.length(listVar)}")
 	public static int length(List<?> list){
 		return list != null ? list.size() : 0;
@@ -32,8 +32,8 @@ public class ListFunctionExecutor implements FunctionExecutor{
 	/**
 	 * 
 	 * @param list 原List
-	 * @param len 按多长进行分割
-	 * @return List<List<?>> 分割后的数组
+	 * @param len How many pieces go into the split
+	 * @return List<List<?>> Shared Music
 	 */
 	@Comment("分割List")
 	@Example("${list.split(listVar,10)}")
@@ -51,13 +51,13 @@ public class ListFunctionExecutor implements FunctionExecutor{
 		return result;
 	}
 	
-	@Comment("截取List")
+	@Comment("InterceptList")
 	@Example("${list.sublist(listVar,fromIndex,toIndex)}")
 	public static List<?> sublist(List<?> list,int fromIndex,int toIndex){
 		return list!= null ? list.subList(fromIndex, toIndex) : new ArrayList<>();
 	}
 
-	@Comment("过滤字符串list元素")
+	@Comment("Filter Stringslist元素")
 	@Example("${listVar.filterStr(pattern)}")
 	public static List<String> filterStr(List<String> list, String pattern) {
 		if (list == null || list.isEmpty()) {

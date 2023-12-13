@@ -14,7 +14,7 @@ import org.spiderflow.core.model.SpiderFlow;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
- * 爬虫资源库 实现爬虫的入库
+ * Crawling the Web Add a new task
  * @author Administrator
  *
  */

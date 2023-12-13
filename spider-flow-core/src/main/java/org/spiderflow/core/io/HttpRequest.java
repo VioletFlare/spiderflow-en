@@ -10,7 +10,7 @@ import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 
 /**
- * 请求对象包装类
+ * Request object packaging class
  * @author Administrator
  *
  */

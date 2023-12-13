@@ -19,7 +19,7 @@ public class FunctionService extends ServiceImpl<FunctionMapper, Function> {
     private static Logger logger = LoggerFactory.getLogger(FunctionService.class);
 
     /**
-     * 初始化/重置自定义函数
+     * Initializing/Reset Custom Function
      */
     @PostConstruct
     private void init(){
@@ -43,7 +43,7 @@ public class FunctionService extends ServiceImpl<FunctionMapper, Function> {
             init();
             return null;
         } catch (Exception e) {
-            logger.error("保存自定义函数出错",e);
+            logger.error("Save Custom Function Error",e);
             return ExceptionUtils.getStackTrace(e);
         }
     }

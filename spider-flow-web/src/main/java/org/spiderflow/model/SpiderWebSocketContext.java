@@ -9,7 +9,7 @@ import javax.websocket.Session;
 import java.util.Date;
 
 /**
- * WebSocket通讯中爬虫的上下文域
+ * WebSocketCommunication context for the active application
  *
  * @author Administrator
  */

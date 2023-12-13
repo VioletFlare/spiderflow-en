@@ -10,55 +10,55 @@ import com.alibaba.fastjson.JSONArray;
 
 
 /**
- * 爬虫节点
+ * Crawling interval
  * @author jmxd
  *
  */
 public class SpiderNode {
 	/**
-	 * 节点的Json属性
+	 * 15th LastJsonProperty
 	 */
 	private Map<String,Object> jsonProperty = new HashMap<>();
 	/**
-	 * 节点列表中的下一个节点
+	 * Next node in the list
 	 */
 	private List<SpiderNode> nextNodes = new ArrayList<>();
 
 	/**
-	 * 节点列表中的上一个节点
+	 * The previous node in the list
 	 */
 	private List<SpiderNode> prevNodes = new ArrayList<>();
 
 	/**
-	 * 父级节点ID
+	 * Parent nodeID
 	 */
 	private Set<String> parentNodes;
 
 	/**
-	 * 节点流转条件
+	 * Condition to switch nodes
 	 */
 	private Map<String,String> condition = new HashMap<>();
 
 	/**
-	 * 异常流转
+	 * Abnormal Rotation
 	 */
 	private Map<String,String> exception = new HashMap<>();
 
 	/**
-	 * 传递变量
+	 * Pass Variable
 	 */
 	private Map<String,String> transmitVariable = new HashMap<>();
 	/**
-	 * 节点名称
+	 * Question Name
 	 */
 	private String nodeName;
 	/**
-	 * 节点ID
+	 * 15th LastID
 	 */
 	private String nodeId;
 
 	/**
-	 * 计数器,用来计算当前节点执行中的个数
+	 * Counter,The current node has finished execution
 	 */
 	private AtomicInteger counter = new AtomicInteger();
 

@@ -24,7 +24,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * 输出执行器
+ * OutputA_pplication
  * @author Administrator
  *
  */
@@ -52,7 +52,7 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 	private static Logger logger = LoggerFactory.getLogger(OutputExecutor.class);
 
 	/**
-	 * 输出CSVPrinter节点变量
+	 * OutputCSVPrinter10 MB
 	 */
 	private Map<String, CSVPrinter> cachePrinter = new HashMap<>();
 
@@ -79,9 +79,9 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 			try {
 				value = ExpressionUtils.execute(outputValue, variables);
 				context.pause(node.getNodeId(),"common",outputName,value);
-				logger.debug("输出{}={}", outputName,value);
+				logger.debug("Output{}={}", outputName,value);
 			} catch (Exception e) {
-				logger.error("输出{}出错，异常信息：{}", outputName,e);
+				logger.error("Output{}Error，Anomalous messages：{}", outputName,e);
 			}
 			output.addOutput(outputName, value);
 			if ((databaseFlag || csvFlag) && value != null) {
@@ -92,9 +92,9 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 			String dsId = node.getStringJsonValue(DATASOURCE_ID);
 			String tableName = node.getStringJsonValue(TABLE_NAME);
 			if (StringUtils.isBlank(dsId)) {
-				logger.warn("数据源ID为空！");
+				logger.warn("Data SourcesIDfor empty！");
 			} else if (StringUtils.isBlank(tableName)) {
-				logger.warn("表名为空！");
+				logger.warn("Table name is empty！");
 			} else {
 				outputDB(dsId, tableName, outputData);
 			}
@@ -107,7 +107,7 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 	}
 
 	/**
-	 * 输出所有参数
+	 * Output all parameters
 	 * @param output
 	 * @param variables
 	 */
@@ -119,18 +119,18 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 				output.addOutput(item.getKey() + ".html", resp.getHtml());
 				continue;
 			}
-			//去除不输出的信息
+			//Remove non-output information
 			if ("ex".equals(item.getKey())) {
 				continue;
 			}
-			//去除不能序列化的参数
+			//Remove unsequenced parameters
 			try {
 				JSON.toJSONString(value, FastJsonSerializer.serializeConfig);
 			} catch (Exception e) {
 				e.printStackTrace();
 				continue;
 			}
-			//输出信息
+			//Output Information
 			output.addOutput(item.getKey(), item.getValue());
 		}
 	}
@@ -143,10 +143,10 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 		Set<String> keySet = data.keySet();
 		Object[] params = new Object[data.size()];
 		SQL sql = new SQL();
-		//设置表名
+		//Set the table name
 		sql.INSERT_INTO(tableName);
 		int index = 0;
-		//设置字段名
+		//Set Field Name
 		for (String key : keySet) {
 			sql.VALUES(key, "?");
 			params[index] = data.get(key);
@@ -156,7 +156,7 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 			//执行sql
 			template.update(sql.toString(), params);
 		} catch (Exception e) {
-			logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
+			logger.error("执行sqlError,Anomalous messages:{}", e.getMessage(), e);
 			ExceptionUtils.wrapAndThrow(e);
 		}
 	}
@@ -196,7 +196,7 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 				printer.printRecord(records);
 			}
 		} catch (IOException e) {
-			logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
+			logger.error("File Output Error,Anomalous messages:{}", e.getMessage(), e);
 			ExceptionUtils.wrapAndThrow(e);
 		}
 	}
@@ -226,7 +226,7 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 					printer.close();
 					this.cachePrinter.remove(entry.getKey());
 				} catch (IOException e) {
-					logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
+					logger.error("File Output Error,Anomalous messages:{}", e.getMessage(), e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			}

@@ -8,7 +8,7 @@ import org.spiderflow.model.SpiderNode;
 import org.springframework.stereotype.Component;
 
 /**
- * 开始执行器
+ * Start Executor
  * @author Administrator
  *
  */

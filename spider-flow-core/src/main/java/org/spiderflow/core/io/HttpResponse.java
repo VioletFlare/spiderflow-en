@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
- * 响应对象包装类
+ * Respondent Packaging Type
  * @author Administrator
  *
  */

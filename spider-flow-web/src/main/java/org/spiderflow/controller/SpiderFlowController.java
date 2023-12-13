@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 爬虫Controller
+ * InsectController
  * @author Administrator
  *
  */
@@ -95,10 +95,10 @@ public class SpiderFlowController {
 	}
 
 	/**
-	 * 爬虫列表
-	 * @param page 页数
-	 * @param size 每页显示条数
-	 * @return Page<SpiderFlow> 所有爬虫的列表页
+	 * Crawling List
+	 * @param page Number of Pages
+	 * @param size Show per page
+	 * @return Page<SpiderFlow> All the articles of the magazine
 	 */
 	@RequestMapping("/list")
 	public IPage<SpiderFlow> list(@RequestParam(name = "page", defaultValue = "1") Integer page, @RequestParam(name = "limit", defaultValue = "1") Integer size, @RequestParam(name = "name", defaultValue = "") String name) {
@@ -191,10 +191,10 @@ public class SpiderFlowController {
 		try (RandomAccessFileReader reader = new RandomAccessFileReader(new RandomAccessFile(logFile,"r"), index == null ? -1 : index, reversed == null || reversed)){
 			return new JsonBean<>(reader.readLine(count == null ? 10 : count,keywords,matchcase != null && matchcase,regx != null && regx));
 		} catch(FileNotFoundException e){
-			return new JsonBean<>(0,"日志文件不存在");
+			return new JsonBean<>(0,"Logfile does not exist");
 		} catch (IOException e) {
-			logger.error("读取日志文件出错",e);
-			return new JsonBean<>(-1,"读取日志文件出错");
+			logger.error("Read error from logfile",e);
+			return new JsonBean<>(-1,"Read error from logfile");
 		}
 	}
 

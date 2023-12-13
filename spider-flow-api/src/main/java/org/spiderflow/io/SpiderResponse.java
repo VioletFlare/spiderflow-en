@@ -10,40 +10,40 @@ import com.alibaba.fastjson.JSON;
 
 public interface SpiderResponse {
 
-	@Comment("获取返回状态码")
+	@Comment("Get the return value")
 	@Example("${resp.statusCode}")
 	int getStatusCode();
 
-	@Comment("获取网页标题")
+	@Comment("Get web page title")
 	@Example("${resp.title}")
 	String getTitle();
 
-	@Comment("获取网页html")
+	@Comment("Get Web Pagehtml")
 	@Example("${resp.html}")
 	String getHtml();
 
-	@Comment("获取json")
+	@Comment("Getjson")
 	@Example("${resp.json}")
 	default Object getJson(){
 		return JSON.parse(getHtml());
 	}
-	@Comment("获取cookies")
+	@Comment("Getcookies")
 	@Example("${resp.cookies}")
 	Map<String,String> getCookies();
 
-	@Comment("获取headers")
+	@Comment("Getheaders")
 	@Example("${resp.headers}")
 	Map<String,String> getHeaders();
 
-	@Comment("获取byte[]")
+	@Comment("Getbyte[]")
 	@Example("${resp.bytes}")
 	byte[] getBytes();
 
-	@Comment("获取ContentType")
+	@Comment("GetContentType")
 	@Example("${resp.contentType}")
 	String getContentType();
 
-	@Comment("获取当前url")
+	@Comment("Get currenturl")
 	@Example("${resp.url}")
 	String getUrl();
 

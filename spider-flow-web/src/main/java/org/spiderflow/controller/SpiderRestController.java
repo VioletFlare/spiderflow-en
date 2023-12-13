@@ -45,7 +45,7 @@ public class SpiderRestController {
 	private TaskService taskService;
 
 	/**
-	 * 异步运行
+	 * SyncInfo
 	 * @param id
 	 * @return
 	 */
@@ -53,7 +53,7 @@ public class SpiderRestController {
 	public JsonBean<Integer> runAsync(@PathVariable("id")String id){
 		SpiderFlow flow = spiderFlowService.getById(id);
 		if(flow == null){
-			return new JsonBean<>(0, "找不到此爬虫信息");
+			return new JsonBean<>(0, "Cannot find this article");
 		}
 		Task task = new Task();
 		task.setFlowId(flow.getId());
@@ -66,22 +66,22 @@ public class SpiderRestController {
 	}
 
 	/**
-	 * 停止运行任务
+	 * Stop Operation
 	 * @param taskId
 	 */
 	@RequestMapping("/stop/{taskId}")
 	public JsonBean<Void> stop(@PathVariable("taskId")Integer taskId){
 		SpiderContext context = SpiderJob.getSpiderContext(taskId);
 		if(context == null){
-			return new JsonBean<>(0,"任务不存在！");
+			return new JsonBean<>(0,"Tasks do not exist！");
 		}
 		context.setRunning(false);
-		return new JsonBean<>(1,"停止成功！");
+		return new JsonBean<>(1,"Stop Successful！");
 
 	}
 
 	/**
-	 * 查询任务状态
+	 * Query task status
 	 * @param taskId
 	 */
 	@RequestMapping("/status/{taskId}")
@@ -90,11 +90,11 @@ public class SpiderRestController {
 		if(context == null){
 			return new JsonBean<>(0);	//
 		}
-		return new JsonBean<>(1);	//正在运行中
+		return new JsonBean<>(1);	//In progress
 	}
 
 	/**
-	 * 同步运行
+	 * Simulate the application's behavior by showing the assistant dialogs on a separate window.
 	 * @param id
 	 * @param params
 	 * @return
@@ -103,7 +103,7 @@ public class SpiderRestController {
 	public JsonBean<List<SpiderOutput>> run(@PathVariable("id")String id,@RequestBody(required = false)Map<String,Object> params){
 		SpiderFlow flow = spiderFlowService.getById(id);
 		if(flow == null){
-			return new JsonBean<>(0, "找不到此爬虫信息");
+			return new JsonBean<>(0, "Cannot find this article");
 		}
 		List<SpiderOutput> outputs;
 		Integer maxId = spiderFlowService.getFlowMaxTaskId(id);
@@ -111,8 +111,8 @@ public class SpiderRestController {
 		try{
 			outputs = spider.run(flow,context, params);	
 		}catch(Exception e){
-			logger.error("执行爬虫失败",e);
-			return new JsonBean<>(-1, "执行失败");
+			logger.error("Failed to execute child process",e);
+			return new JsonBean<>(-1, "Failed to execute");
 		} finally{
 			context.close();
 		}

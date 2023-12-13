@@ -7,7 +7,7 @@ import org.spiderflow.executor.FunctionExecutor;
 import org.springframework.stereotype.Component;
 
 /**
- * 随机数/字符串 生成方法 
+ * Random number/String Generating method 
  * @author Administrator
  *
  */
@@ -19,19 +19,19 @@ public class RandomFunctionExecutor implements FunctionExecutor{
 		return "random";
 	}
 	
-	@Comment("随机获取int")
+	@Comment("Get Randomint")
 	@Example("${random.randomInt(1,10)}")
 	public static int randomInt(int min,int max){
 		return RandomUtils.nextInt(min, max);
 	}
 	
-	@Comment("随机获取double")
+	@Comment("Get Randomdouble")
 	@Example("${random.randomDouble(1,10)}")
 	public static double randomDouble(double min,double max){
 		return RandomUtils.nextDouble(min, max);
 	}
 	
-	@Comment("随机获取long")
+	@Comment("Get Randomlong")
 	@Example("${random.randomLong(1,10)}")
 	public static long randomLong(long min,long max){
 		return RandomUtils.nextLong(min, max);
@@ -39,11 +39,11 @@ public class RandomFunctionExecutor implements FunctionExecutor{
 	
 	/**
 	 * 
-	 * @param chars 字符个数
-	 * @param length 字符范围
+	 * @param chars Number of characters
+	 * @param length Character Ranges
 	 * @return String 随机字符串
 	 */
-	@Comment("随机获取字符串")
+	@Comment("Get random string")
 	@Example("${random.string('abcde',10)}")
 	public static String string(String chars,int length){
 		if (chars != null) {

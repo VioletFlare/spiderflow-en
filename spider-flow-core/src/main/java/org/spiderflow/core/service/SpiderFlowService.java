@@ -29,7 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 爬虫流程执行服务
+ * Crawling process is currently running
  * @author Administrator
  *
  */
@@ -50,12 +50,12 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	@Value("${spider.workspace}")
 	private String workspace;
 
-	//项目启动后自动查询需要执行的任务进行爬取
+	//Perform the tasks that gedit will automatically execute on file open
 	@PostConstruct
 	private void initJobs(){
-		//清空所有任务下次执行时间
+		//Next scheduled task time
 		sfMapper.resetNextExecuteTime();
-		//获取启用corn的任务
+		//Get enablecorn的Tasks
 		List<SpiderFlow> spiderFlows = sfMapper.selectList(new QueryWrapper<SpiderFlow>().eq("enabled", "1"));
 		if(spiderFlows != null && !spiderFlows.isEmpty()){
 			for (SpiderFlow sf : spiderFlows) {
@@ -83,9 +83,9 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	}
 
 	/**
-	 * 重置定时任务
-	 * @param id 爬虫的ID
-	 * @param cron 定时器
+	 * Reset Scheduled Task
+	 * @param id CrawlingID
+	 * @param cron Timer
 	 */
 	public void resetCornExpression(String id, String cron){
 		CronTrigger trigger = TriggerBuilder.newTrigger()
@@ -102,7 +102,7 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 
 	@Override
 	public boolean save(SpiderFlow spiderFlow){
-		//解析corn,获取并设置任务的开始时间
+		//Analysecorn,Get and set the start time of a to-do
 		if(StringUtils.isNotEmpty(spiderFlow.getCron())){
 			CronTrigger trigger = TriggerBuilder.newTrigger()
 							.withIdentity("Caclulate Next Execute Date")
@@ -110,14 +110,14 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 							.build();
 			spiderFlow.setNextExecuteTime(trigger.getStartTime());
 		}
-		if(StringUtils.isNotEmpty(spiderFlow.getId())){	//update 任务
+		if(StringUtils.isNotEmpty(spiderFlow.getId())){	//update Tasks
 			sfMapper.updateSpiderFlow(spiderFlow.getId(), spiderFlow.getName(), spiderFlow.getXml());
 			spiderJobManager.remove(spiderFlow.getId());
 			spiderFlow = getById(spiderFlow.getId());
 			if("1".equals(spiderFlow.getEnabled()) && StringUtils.isNotEmpty(spiderFlow.getCron())){
 				spiderJobManager.addJob(spiderFlow);
 			}
-		}else{//insert 任务
+		}else{//insert Tasks
 			String id = UUID.randomUUID().toString().replace("-", "");
 			sfMapper.insertSpiderFlow(id, spiderFlow.getName(), spiderFlow.getXml());
 			spiderFlow.setId(id);
@@ -126,7 +126,7 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 		try {
 			FileUtils.write(file,spiderFlow.getXml(),"UTF-8");
 		} catch (IOException e) {
-			logger.error("保存历史记录出错",e);
+			logger.error("Save History Error",e);
 		}
 		return true;
 	}
@@ -138,7 +138,7 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	}
 
 	public void copy(String id){
-		// 复制ID
+		// CopyID
 		SpiderFlow spiderFlow = sfMapper.selectById(id);
 		String new_id = UUID.randomUUID().toString().replace("-", "");
 		sfMapper.insertSpiderFlow(new_id, spiderFlow.getName() + "-copy", spiderFlow.getXml());
@@ -177,9 +177,9 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	}
 
     /**
-     * 根据表达式获取最近几次运行时间
-	 * @param cron 表达式
-	 * @param numTimes 几次
+     * Get the recent run times for an expression
+	 * @param cron Answer
+	 * @param numTimes Repeated
 	 * @return
      */
 	public List<String> getRecentTriggerTime(String cron,int numTimes) {
@@ -190,7 +190,7 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 					.withSchedule(CronScheduleBuilder.cronSchedule(cron))
 					.build();
 		}catch (Exception e) {
-			list.add("cron表达式 "+cron+" 有误：" + e.getCause());
+			list.add("cronAnswer "+cron+" 有误：" + e.getCause());
 			return list;
 		}
 		List<Date> dates = TriggerUtils.computeFireTimes((OperableTrigger) trigger, null, numTimes);
@@ -218,7 +218,7 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 			try {
 				return FileUtils.readFileToString(file,"UTF-8");
 			} catch (IOException e) {
-				logger.error("读取历史版本出错",e);
+				logger.error("Read history version error",e);
 			}
 		}
 		return null;

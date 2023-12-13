@@ -64,7 +64,7 @@ public class SpiderJobContext extends SpiderContext{
 			}
 			os = new FileOutputStream(file, true);
 		} catch (Exception e) {
-			logger.error("创建日志文件出错",e);
+			logger.error("Logfile creation failed",e);
 		}
 		SpiderJobContext context = new SpiderJobContext(os, output);
 		context.setFlowId(id);

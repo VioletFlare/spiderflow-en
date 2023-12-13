@@ -13,7 +13,7 @@ import org.spiderflow.model.SpiderNode;
 import org.springframework.stereotype.Component;
 
 /**
- * 定义变量执行器
+ * Define a variable action
  * @author Administrator
  *
  */
@@ -35,10 +35,10 @@ public class VariableExecutor implements ShapeExecutor{
 			String variableValue = nameValue.get(VARIABLE_VALUE);
 			try {
 				value = ExpressionUtils.execute(variableValue, variables);
-				logger.debug("设置变量{}={}",variableName,value);
+				logger.debug("Set Variable{}={}",variableName,value);
 				context.pause(node.getNodeId(),"common",variableName,value);
 			} catch (Exception e) {
-				logger.error("设置变量{}出错，异常信息：{}",variableName,e);
+				logger.error("Set Variable{}Error，Anomalous messages：{}",variableName,e);
 				ExceptionUtils.wrapAndThrow(e);
 			}
 			variables.put(variableName, value);

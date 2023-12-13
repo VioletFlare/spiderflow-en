@@ -10,7 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * 爬虫上下文
+ * Crawling context
  * @author jmxd
  *
  */
@@ -26,7 +26,7 @@ public class SpiderContext extends HashMap<String, Object>{
 	private static final long serialVersionUID = 8379177178417619790L;
 
 	/**
-	 * 流程执行线程
+	 * Procedure execution thread
 	 */
 	private SubThreadPoolExecutor threadPool;
 
@@ -36,17 +36,17 @@ public class SpiderContext extends HashMap<String, Object>{
 	private SpiderNode rootNode;
 
 	/**
-	 * 爬虫是否运行中
+	 * Is the Crawler running
 	 */
 	private volatile boolean running = true;
 
 	/**
-	 * Future队列
+	 * FutureQueue
 	 */
 	private LinkedBlockingQueue<Future<?>> futureQueue = new LinkedBlockingQueue<>();
 
 	/**
-	 * Cookie上下文
+	 * CookieContexte
 	 */
 	private CookieContext cookieContext = new CookieContext();
 

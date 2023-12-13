@@ -4,14 +4,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 流程通知方式
+ * Process Notification Mode
  * 
  * @author BillDowney
- * @date 2020年4月3日 下午3:26:18
+ * @date 2020Year4Month3Sun Afternoon3:26:18
  */
 public enum FlowNoticeWay {
 
-	email("邮件通知");
+	email("Email Notifications");
 
 	private FlowNoticeWay(String title) {
 		this.title = title;

@@ -34,12 +34,12 @@ public class ExpressionUtils {
     public static boolean executeCondition(SpiderNode fromNode, SpiderNode node, Map<String, Object> variables) {
         if (fromNode != null) {
             String condition = node.getCondition(fromNode.getNodeId());
-            if (StringUtils.isNotBlank(condition)) { // 判断是否有条件
+            if (StringUtils.isNotBlank(condition)) { // If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.
                 Object result = null;
                 try {
                     result = engine.execute(condition, variables);
                 } catch (Exception e) {
-                    logger.error("判断{}出错,异常信息：{}", condition, e);
+                    logger.error("判断{}Error,Anomalous messages：{}", condition, e);
                 }
                 if (result != null) {
                     boolean isContinue = "true".equals(result) || Objects.equals(result, true);

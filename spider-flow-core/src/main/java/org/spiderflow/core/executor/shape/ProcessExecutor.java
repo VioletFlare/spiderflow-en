@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * 子流程执行器
+ * Sub-process Executor
  * @author Administrator
  *
  */
@@ -37,11 +37,11 @@ public class ProcessExecutor implements ShapeExecutor{
 		String flowId = node.getStringJsonValue("flowId");
 		SpiderFlow spiderFlow = spiderFlowService.getById(flowId);
 		if(spiderFlow != null){
-			logger.info("执行子流程:{}", spiderFlow.getName());
+			logger.info("Executable:{}", spiderFlow.getName());
 			SpiderNode root = SpiderFlowUtils.loadXMLFromString(spiderFlow.getXml());
 			spider.executeNode(null,root,context,variables);
 		}else{
-			logger.info("执行子流程:{}失败，找不到该子流程", flowId);
+			logger.info("Executable:{}Failure，Cannot find the sub-process", flowId);
 		}
 	}
 

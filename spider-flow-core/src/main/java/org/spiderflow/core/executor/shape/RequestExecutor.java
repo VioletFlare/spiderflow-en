@@ -30,7 +30,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 /**
- * 请求执行器
+ * Request Executor
  * @author Administrator
  *
  */
@@ -109,7 +109,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 
 	@PostConstruct
 	void init(){
-		//允许设置被限制的请求头
+		//Allow setting of restricted request headers
 		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
 	}
 
@@ -123,94 +123,94 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 				if(value != null){
 					long sleepTime = NumberUtils.toLong(value.toString(), 0L);
 					synchronized (node.getNodeId().intern()) {
-						//实际等待时间 = 上次执行时间 + 睡眠时间 - 当前时间
+						//Actual wait time = Next time the reminder is triggered + Sleep Time - Current Time
 						Long lastExecuteTime = context.get(LAST_EXECUTE_TIME + node.getNodeId(), 0L);
 						if (lastExecuteTime != 0) {
 							sleepTime = lastExecuteTime + sleepTime - System.currentTimeMillis();
 						}
 						if (sleepTime > 0) {
 							context.pause(node.getNodeId(),"common",SLEEP,sleepTime);
-							logger.debug("设置延迟时间:{}ms", sleepTime);
+							logger.debug("Please set a delay:{}ms", sleepTime);
 							Thread.sleep(sleepTime);
 						}
 						context.put(LAST_EXECUTE_TIME + node.getNodeId(), System.currentTimeMillis());
 					}
 				}
 			} catch (Throwable t) {
-				logger.error("设置延迟时间失败", t);
+				logger.error("Failed to set delay.", t);
 			}
 		}
 		BloomFilter<String> bloomFilter = null;
-		//重试次数
+		//Retry Count
 		int retryCount = NumberUtils.toInt(node.getStringJsonValue(RETRY_COUNT), 0) + 1;
-		//重试间隔时间，单位毫秒
+		//Retry delay，Seconds
 		int retryInterval = NumberUtils.toInt(node.getStringJsonValue(RETRY_INTERVAL), 0);
         boolean successed = false;
 		for (int i = 0; i < retryCount && !successed; i++) {
 			HttpRequest request = HttpRequest.create();
-			//设置请求url
+			//Setup Requesturl
 			String url = null;
 			try {
 				url = ExpressionUtils.execute(node.getStringJsonValue(URL), variables).toString();
 			} catch (Exception e) {
-				logger.error("设置请求url出错，异常信息", e);
+				logger.error("Setup RequesturlError，Anomalous messages", e);
 				ExceptionUtils.wrapAndThrow(e);
 			}
 			if("1".equalsIgnoreCase(node.getStringJsonValue(REPEAT_ENABLE,"0"))){
 				bloomFilter = createBloomFilter(context);
 				synchronized (bloomFilter){
 					if(bloomFilter.mightContain(MD5FunctionExecutor.string(url))){
-						logger.info("过滤重复URL:{}",url);
+						logger.info("The following text is not translated:URL:{}",url);
 						return;
 					}
 				}
 			}
 			context.pause(node.getNodeId(),"common",URL,url);
-			logger.info("设置请求url:{}", url);
+			logger.info("Setup Requesturl:{}", url);
 			request.url(url);
-			//设置请求超时时间
+			//Please set the request timeout
 			int timeout = NumberUtils.toInt(node.getStringJsonValue(TIMEOUT), 60000);
-			logger.debug("设置请求超时时间:{}", timeout);
+			logger.debug("Please set the request timeout:{}", timeout);
 			request.timeout(timeout);
 
 			String method = Objects.toString(node.getStringJsonValue(REQUEST_METHOD), "GET");
-			//设置请求方法
+			//Set Request Method
 			request.method(method);
-			logger.debug("设置请求方法:{}", method);
+			logger.debug("Set Request Method:{}", method);
 
-			//是否跟随重定向
+			//Whether to follow redirects
 			boolean followRedirects = !"0".equals(node.getStringJsonValue(FOLLOW_REDIRECT));
 			request.followRedirect(followRedirects);
-			logger.debug("设置跟随重定向：{}", followRedirects);
+			logger.debug("Set Up Follow Up Redirect：{}", followRedirects);
 
-			//是否验证TLS证书,默认是验证
+			//Are you sure you want to delete the meeting titled '{0}'?TLSCertificate,默认是验证
 			if("0".equals(node.getStringJsonValue(TLS_VALIDATE))){
 				request.validateTLSCertificates(false);
-				logger.debug("设置TLS证书验证：{}", false);
+				logger.debug("1 hour before appointmentTLSCertificate Authentication：{}", false);
 			}
 			SpiderNode root = context.getRootNode();
-			//设置请求header
+			//Setup Requestheader
 			setRequestHeader(root, request, root.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);
 			setRequestHeader(node, request, node.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);
 
-			//设置全局Cookie
+			//Set GlobalCookie
 			Map<String, String> cookies = getRequestCookie(root, root.getListJsonValue(COOKIE_NAME, COOKIE_VALUE), context, variables);
 			if(!cookies.isEmpty()){
-				logger.info("设置全局Cookie：{}", cookies);
+				logger.info("Set GlobalCookie：{}", cookies);
 				request.cookies(cookies);
 			}
-			//设置自动管理的Cookie
+			//Set Up Automatic ManagementCookie
 			boolean cookieAutoSet = !"0".equals(node.getStringJsonValue(COOKIE_AUTO_SET));
 			if(cookieAutoSet && !cookieContext.isEmpty()){
 				context.pause(node.getNodeId(),COOKIE_AUTO_SET,COOKIE_AUTO_SET,cookieContext);
 				request.cookies(cookieContext);
-				logger.info("自动设置Cookie：{}", cookieContext);
+				logger.info("Auto SetupCookie：{}", cookieContext);
 			}
-			//设置本节点Cookie
+			//Set Up This NodeCookie
 			cookies = getRequestCookie(node, node.getListJsonValue(COOKIE_NAME, COOKIE_VALUE), context, variables);
 			if(!cookies.isEmpty()){
 				request.cookies(cookies);
-				logger.debug("设置Cookie：{}", cookies);
+				logger.debug("1 hour before appointmentCookie：{}", cookies);
 			}
 			if(cookieAutoSet){
 				cookieContext.putAll(cookies);
@@ -225,19 +225,19 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 					Object requestBody = ExpressionUtils.execute(node.getStringJsonValue(REQUEST_BODY), variables);
 					context.pause(node.getNodeId(),"request-body",REQUEST_BODY,requestBody);
 					request.data(requestBody);
-					logger.info("设置请求Body:{}", requestBody);
+					logger.info("Setup RequestBody:{}", requestBody);
 				} catch (Exception e) {
-					logger.debug("设置请求Body出错", e);
+					logger.debug("Setup RequestBodyError", e);
 				}
 			}else if("form-data".equals(bodyType)){
 				List<Map<String, String>> formParameters = node.getListJsonValue(PARAMETER_FORM_NAME,PARAMETER_FORM_VALUE,PARAMETER_FORM_TYPE,PARAMETER_FORM_FILENAME);
 				streams = setRequestFormParameter(node,request,formParameters,context,variables);
 			}else{
-				//设置请求参数
+				//Set Request Parameters
 				setRequestParameter(root, request, root.getListJsonValue(PARAMETER_NAME,PARAMETER_VALUE), context, variables);
 				setRequestParameter(node, request, node.getListJsonValue(PARAMETER_NAME,PARAMETER_VALUE), context, variables);
 			}
-			//设置代理
+			//Set Up Proxy
 			String proxy = node.getStringJsonValue(PROXY);
 			if(StringUtils.isNotBlank(proxy)){
 				try {
@@ -247,11 +247,11 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 						String[] proxyArr = value.toString().split(":");
 						if(proxyArr.length == 2){
 							request.proxy(proxyArr[0], Integer.parseInt(proxyArr[1]));
-							logger.info("设置代理：{}",proxy);
+							logger.info("Set Up Proxy：{}",proxy);
 						}
 					}
 				} catch (Exception e) {
-					logger.error("设置代理出错，异常信息:{}",e);
+					logger.error("Set Proxy Error，Anomalous messages:{}",e);
 				}
 			}
 			Throwable exception = null;
@@ -267,11 +267,11 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
                     String charset = node.getStringJsonValue(RESPONSE_CHARSET);
                     if(StringUtils.isNotBlank(charset)){
                         response.setCharset(charset);
-                        logger.debug("设置response charset:{}",charset);
+                        logger.debug("1 hour before appointmentresponse charset:{}",charset);
                     }
-                    //cookie存入cookieContext
+                    //cookieSavecookieContext
                     cookieContext.putAll(response.getCookies());
-                    //结果存入变量
+                    //Save result to variable
                     variables.put("resp", response);
                 }
 			} catch (IOException e) {
@@ -294,11 +294,11 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
                             } catch (InterruptedException ignored) {
                             }
                         }
-                        logger.info("第{}次重试:{}",i + 1,url);
+                        logger.info("1st{}Next Retry:{}",i + 1,url);
                     }else{
-                        //记录访问失败的日志
-						if(context.getFlowId() != null){ //测试环境
-							//TODO 需增加记录请求参数
+                        //Log access denied log
+						if(context.getFlowId() != null){ //Test Environment
+							//TODO Add Record Request Parameters
 							File file = new File(workspcace, context.getFlowId() + File.separator + "logs" + File.separator + "access_error.log");
 							try {
 								File directory = file.getParentFile();
@@ -309,7 +309,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 							} catch (IOException ignored) {
 							}
 						}
-                        logger.error("请求{}出错,异常信息:{}",url,exception);
+                        logger.error("Request{}Error,Anomalous messages:{}",url,exception);
                     }
                 }
 			}
@@ -342,18 +342,18 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 								streams.add(stream);
 								request.data(parameterName, parameterFilename, stream);
 								context.pause(node.getNodeId(),"request-body",parameterName,parameterFilename);
-								logger.info("设置请求参数：{}={}",parameterName,parameterFilename);
+								logger.info("Set Request Parameters：{}={}",parameterName,parameterFilename);
 							}else{
-								logger.warn("设置请求参数：{}失败，无二进制内容",parameterName);
+								logger.warn("Set Request Parameters：{}Failure，No binary content",parameterName);
 							}
 						}else{
 							request.data(parameterName, value);
 							context.pause(node.getNodeId(),"request-body",parameterName,value);
-							logger.info("设置请求参数：{}={}",parameterName,value);
+							logger.info("Set Request Parameters：{}={}",parameterName,value);
 						}
 						
 					} catch (Exception e) {
-						logger.error("设置请求参数：{}出错,异常信息:{}",parameterName,e);
+						logger.error("Set Request Parameters：{}Error,Anomalous messages:{}",parameterName,e);
 					}
 				}
 			}
@@ -374,10 +374,10 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 						if (value != null) {
 							cookieMap.put(cookieName, value.toString());
 							context.pause(node.getNodeId(),"request-cookie",cookieName,value.toString());
-							logger.info("设置请求Cookie：{}={}", cookieName, value);
+							logger.info("Setup RequestCookie：{}={}", cookieName, value);
 						}
 					} catch (Exception e) {
-						logger.error("设置请求Cookie：{}出错,异常信息：{}", cookieName, e);
+						logger.error("Setup RequestCookie：{}Error,Anomalous messages：{}", cookieName, e);
 					}
 				}
 			}
@@ -395,9 +395,9 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 					try {
 						value = ExpressionUtils.execute(parameterValue, variables);
 						context.pause(node.getNodeId(),"request-parameter",parameterName,value);
-						logger.info("设置请求参数：{}={}", parameterName, value);
+						logger.info("Set Request Parameters：{}={}", parameterName, value);
 					} catch (Exception e) {
-						logger.error("设置请求参数：{}出错,异常信息：{}", parameterName, e);
+						logger.error("Set Request Parameters：{}Error,Anomalous messages：{}", parameterName, e);
 					}
 					request.data(parameterName, value);
 				}
@@ -415,9 +415,9 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 					try {
 						value = ExpressionUtils.execute(headerValue, variables);
 						context.pause(node.getNodeId(),"request-header",headerName,value);
-						logger.info("设置请求Header：{}={}", headerName, value);
+						logger.info("Setup RequestHeader：{}={}", headerName, value);
 					} catch (Exception e) {
-						logger.error("设置请求Header：{}出错,异常信息：{}", headerName, e);
+						logger.error("Setup RequestHeader：{}Error,Anomalous messages：{}", headerName, e);
 					}
 					request.header(headerName, value);
 				}
@@ -430,7 +430,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 		List<Grammer> grammers = Grammer.findGrammers(SpiderResponse.class,"resp" , "SpiderResponse", false);
 		Grammer grammer = new Grammer();
 		grammer.setFunction("resp");
-		grammer.setComment("抓取结果");
+		grammer.setComment("Fetch Results");
 		grammer.setOwner("SpiderResponse");
 		grammers.add(grammer);
 		return grammers;
@@ -451,7 +451,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 				try(FileInputStream fis = new FileInputStream(file)){
 					filter = BloomFilter.readFrom(fis,funnel);
 				} catch (IOException e) {
-					logger.error("读取布隆过滤器出错",e);
+					logger.error("Failed to read from brl filter",e);
 				}
 
 			}else{
@@ -474,7 +474,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 				filter.writeTo(fos);
 				fos.flush();
 			}catch(IOException e){
-				logger.error("保存布隆过滤器出错",e);
+				logger.error("Save Error",e);
 			}
 		}
 	}

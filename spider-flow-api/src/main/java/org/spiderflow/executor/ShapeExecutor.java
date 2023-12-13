@@ -6,7 +6,7 @@ import org.spiderflow.context.SpiderContext;
 import org.spiderflow.model.Shape;
 import org.spiderflow.model.SpiderNode;
 /**
- * 执行器接口
+ * Implementation generation error
  * @author jmxd
  *
  */
@@ -23,16 +23,16 @@ public interface ShapeExecutor {
 	}
 	
 	/**
-	 * 节点形状
-	 * @return 节点形状名称
+	 * What is your name?
+	 * @return Shape Name
 	 */
 	String supportShape();
 	
 	/**
-	 * 执行器具体的功能实现
-	 * @param node 当前要执行的爬虫节点
-	 * @param context 爬虫上下文
-	 * @param variables 节点流程的全部变量的集合
+	 * The following sources are available:
+	 * @param node Currently executing node:
+	 * @param context Crawling context
+	 * @param variables The set of all variables in a node flow
 	 */
 	void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables);
 	

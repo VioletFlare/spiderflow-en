@@ -14,7 +14,7 @@ import org.spiderflow.executor.FunctionExecutor;
 import org.springframework.stereotype.Component;
 
 /**
- * url 按指定字符集进行编码/解码 默认字符集(UTF-8) 工具类 防止NPE 
+ * url Character set to use in the encoding/Decrypt Default charset(UTF-8) Class Instance PreventNPE 
  */
 @Component
 public class UrlFunctionExecutor implements FunctionExecutor{
@@ -24,13 +24,13 @@ public class UrlFunctionExecutor implements FunctionExecutor{
 		return "url";
 	}
 	
-	@Comment("获取url参数")
+	@Comment("GeturlParameters")
 	@Example("${url.parameter('http://www.baidu.com/s?wd=spider-flow','wd')}")
 	public static String parameter(String url,String key){
 		return parameterMap(url).get(key);
 	}
 	
-	@Comment("获取url全部参数")
+	@Comment("GeturlAll parameters")
 	@Example("${url.parameterMap('http://www.baidu.com/s?wd=spider-flow&abbr=sf')}")
 	public static Map<String,String> parameterMap(String url){
 		Map<String,String> map = new HashMap<String,String>();
@@ -61,13 +61,13 @@ public class UrlFunctionExecutor implements FunctionExecutor{
 		return map;
 	}
 	
-	@Comment("url编码")
+	@Comment("urlCode")
 	@Example("${url.encode('http://www.baidu.com/s?wd=spider-flow')}")
 	public static String encode(String url){
 		return encode(url,Charset.defaultCharset().name());
 	}
 	
-	@Comment("url编码")
+	@Comment("urlCode")
 	@Example("${url.encode('http://www.baidu.com/s?wd=spider-flow','UTF-8')}")
 	public static String encode(String url,String charset){
 		try {
@@ -77,13 +77,13 @@ public class UrlFunctionExecutor implements FunctionExecutor{
 		}
 	}
 	
-	@Comment("url解码")
+	@Comment("urlDecrypt")
 	@Example("${url.decode(strVar)}")
 	public static String decode(String url){
 		return decode(url,Charset.defaultCharset().name());
 	}
 	
-	@Comment("url解码")
+	@Comment("urlDecrypt")
 	@Example("${url.decode(strVar,'UTF-8')}")
 	public static String decode(String url,String charset){
 		try {

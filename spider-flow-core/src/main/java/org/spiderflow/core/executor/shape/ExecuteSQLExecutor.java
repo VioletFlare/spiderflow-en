@@ -24,7 +24,7 @@ import java.sql.Statement;
 import java.util.*;
 
 /**
- * SQL执行器
+ * SQLA_pplication
  *
  * @author jmxd
  */
@@ -58,31 +58,31 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 		String dsId = node.getStringJsonValue(DATASOURCE_ID);
 		String sql = node.getStringJsonValue(SQL);
 		if (StringUtils.isBlank(dsId)) {
-			logger.warn("数据源ID为空！");
+			logger.warn("Data SourcesIDfor empty！");
 		} else if (StringUtils.isBlank(sql)) {
-			logger.warn("sql为空！");
+			logger.warn("sqlfor empty！");
 		} else {
 			JdbcTemplate template = new JdbcTemplate(DataSourceUtils.getDataSource(dsId));
-			//把变量替换成占位符
+			//Replace & Variable with Placeholder
 			List<String> parameters = ExtractUtils.getMatchers(sql, "#(.*?)#", true);
 			sql = sql.replaceAll("#(.*?)#", "?");
 			try {
 				Object sqlObject = ExpressionUtils.execute(sql, variables);
 				if(sqlObject == null){
-					logger.warn("获取的sql为空！");
+					logger.warn("Get的sqlfor empty！");
 					return;
 				}
 				sql = sqlObject.toString();
 				context.pause(node.getNodeId(),"common",SQL,sql);
 			} catch (Exception e) {
-				logger.error("获取sql出错,异常信息:{}", e.getMessage(), e);
+				logger.error("GetsqlError,Anomalous messages:{}", e.getMessage(), e);
 				ExceptionUtils.wrapAndThrow(e);
 			}
 			int size = parameters.size();
 			Object[] params = new Object[size];
 			boolean hasList = false;
 			int parameterSize = 0;
-			//当参数中存在List或者数组时，认为是批量操作
+			//When a parameter containsListor array，We believe it was a bulk operation.
 			for (int i = 0; i < size; i++) {
 				Object parameter = ExpressionUtils.execute(parameters.get(i), variables);
 				if (parameter != null) {
@@ -108,7 +108,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 					}
 				} catch (Exception e) {
 					variables.put("rs", null);
-					logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
+					logger.error("执行sqlError,Anomalous messages:{}", e.getMessage(), e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			} else if (STATEMENT_SELECT_ONE.equals(statementType)) {
@@ -118,7 +118,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 					variables.put("rs", rs);
 				} catch (Exception e) {
 					variables.put("rs", null);
-					logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
+					logger.error("执行sqlError,Anomalous messages:{}", e.getMessage(), e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			} else if (STATEMENT_SELECT_INT.equals(statementType)) {
@@ -129,7 +129,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 					variables.put("rs", rs);
 				} catch (Exception e) {
 					variables.put("rs", 0);
-					logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
+					logger.error("执行sqlError,Anomalous messages:{}", e.getMessage(), e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			} else if (STATEMENT_UPDATE.equals(statementType) || STATEMENT_INSERT.equals(statementType) || STATEMENT_DELETE.equals(statementType)) {
@@ -137,9 +137,9 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 					int updateCount = 0;
 					if (hasList) {
 						/*
-						  批量操作时，将参数Object[]转化为List<Object[]>
-						  当参数不为数组或List时，自动转为Object[]
-						  当数组或List长度不足时，自动取最后一项补齐
+						  When doing bulk operations，AnswerObject[]转化为List<Object[]>
+						  If parameter is not an array or not an objectList时，Auto switch toObject[]
+						  When array orListWhen the length is too short，Fill in Last Missing Item
 						 */
 						int[] rs = template.batchUpdate(sql, convertParameters(params, parameterSize));
 						if (rs.length > 0) {
@@ -150,7 +150,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 					}
 					variables.put("rs", updateCount);
 				} catch (Exception e) {
-					logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
+					logger.error("执行sqlError,Anomalous messages:{}", e.getMessage(), e);
 					variables.put("rs", -1);
 					ExceptionUtils.wrapAndThrow(e);
 				}
@@ -165,7 +165,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 					}, keyHolder);
 					variables.put("rs", keyHolder.getKey().intValue());
 				} catch (Exception e) {
-					logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
+					logger.error("执行sqlError,Anomalous messages:{}", e.getMessage(), e);
 					variables.put("rs", -1);
 					ExceptionUtils.wrapAndThrow(e);
 				}
@@ -213,7 +213,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 	@Override
 	public List<Grammer> grammers() {
 		Grammer grammer = new Grammer();
-		grammer.setComment("执行SQL结果");
+		grammer.setComment("执行SQLOutcome");
 		grammer.setFunction("rs");
 		grammer.setReturns(Arrays.asList("List<Map<String,Object>>", "int"));
 		return Collections.singletonList(grammer);

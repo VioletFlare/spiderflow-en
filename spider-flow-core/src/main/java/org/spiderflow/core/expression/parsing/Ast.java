@@ -795,7 +795,7 @@ public abstract class Ast {
 		@Override
 		public Object evaluate (ExpressionTemplate template, ExpressionTemplateContext context) throws IOException {
 			Object value = context.get(getSpan().getText());
-			//if (value == null) ExpressionError.error("找不到变量'" + getSpan().getText() + "'或变量值为null", getSpan());
+			//if (value == null) ExpressionError.error("Find Variable'" + getSpan().getText() + "'Or variable value isnull", getSpan());
 			return value;
 		}
 	}
@@ -951,7 +951,7 @@ public abstract class Ast {
 					return methodCall.evaluate(template, context);
 				} catch (TemplateException e) {
 					if(ExceptionUtils.indexOfThrowable(e, InvocationTargetException.class) > -1){
-						ExpressionError.error(String.format("在%s中调用方法get%s发生异常"
+						ExpressionError.error(String.format("On%sUse the following phrases:get%sAn error occurred"
 								,object.getClass()
 								,methodName), getSpan(),e);
 						return null;
@@ -962,12 +962,12 @@ public abstract class Ast {
 						return methodCall.evaluate(template, context);
 					} catch (TemplateException e1) {
 						if(ExceptionUtils.indexOfThrowable(e1, InvocationTargetException.class) > -1){
-							ExpressionError.error(String.format("在%s中调用方法is%s发生异常"
+							ExpressionError.error(String.format("On%sUse the following phrases:is%sAn error occurred"
 									,object.getClass()
 									,methodName), getSpan(),e);
 							return null;
 						}
-						ExpressionError.error(String.format("在%s中找不到属性%s或者方法get%s、方法is%s"
+						ExpressionError.error(String.format("On%sText not found in translation memory%sOr methodget%s、Methodis%s"
 								,object.getClass()
 								,getName().getText()
 								,methodName
@@ -1232,13 +1232,13 @@ public abstract class Ast {
 					// didn't find the method on the object, try to find a field pointing to a lambda
 					Object field = Reflection.getInstance().getField(object, getMethod().getName().getText());
 					if (field == null){
-						ExpressionError.error("在'" + object.getClass() + "'中找不到方法 " + getMethod().getName().getText() + "(" + StringUtils.join(JavaReflection.getStringTypes(argumentValues),",") + ")",
+						ExpressionError.error("On'" + object.getClass() + "'Cannot find method in class " + getMethod().getName().getText() + "(" + StringUtils.join(JavaReflection.getStringTypes(argumentValues),",") + ")",
 							getSpan());
 					}
 					Object function = Reflection.getInstance().getFieldValue(object, field);
 					method = Reflection.getInstance().getMethod(function, null, argumentValues);
 					if (method == null){
-						ExpressionError.error("在'" + object.getClass() + "'中找不到方法 " + getMethod().getName().getText() + "("+ StringUtils.join(JavaReflection.getStringTypes(argumentValues),",") +")",
+						ExpressionError.error("On'" + object.getClass() + "'Cannot find method in class " + getMethod().getName().getText() + "("+ StringUtils.join(JavaReflection.getStringTypes(argumentValues),",") +")",
 								getSpan());
 					} 
 					try {

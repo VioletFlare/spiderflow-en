@@ -7,29 +7,29 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 /**
- * 邮件发送工具类
+ * Mail Sending Tools
  * 
  * @author BillDowney
- * @date 2020年4月4日 上午12:31:09
+ * @date 2020Year4Month4Sun AM12:31:09
  */
 @Component
 public class EmailUtils {
 
-	// 发送邮件服务
+	// Sendmail service
 	@Autowired
 	private JavaMailSender javaMailSender;
-	// 发送者
+	// Recipient
 	@Value("${spring.mail.username}")
 	private String from;
 
 	/**
-	 * 发送简单文本邮件
+	 * Send a simple text mail
 	 * 
-	 * @param subject 主题
+	 * @param subject Topic
 	 * @param content 内容
-	 * @param to      收件人列表
+	 * @param to      Address List
 	 * @author BillDowney
-	 * @date 2020年4月4日 上午12:40:42
+	 * @date 2020Year4Month4Sun AM12:40:42
 	 */
 	public void sendSimpleMail(String subject, String content, String... to) {
 		SimpleMailMessage message = new SimpleMailMessage();

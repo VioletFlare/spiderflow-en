@@ -1,7 +1,7 @@
 package org.spiderflow.model;
 
 /**
- * WebSocket事件
+ * WebSocketEvents
  * @author Administrator
  *
  * @param <T>

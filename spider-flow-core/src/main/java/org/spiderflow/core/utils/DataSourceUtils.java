@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.druid.pool.DruidDataSource;
 
 /**
- * 数据库连接工具类
+ * Class of the data base connection tool
  * @author jmxd
  *
  */

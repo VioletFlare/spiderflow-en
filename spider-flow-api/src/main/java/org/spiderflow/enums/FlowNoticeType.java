@@ -1,22 +1,22 @@
 package org.spiderflow.enums;
 
 /**
- * 流程通知类型
+ * Process notification type
  * 
  * @author BillDowney
- * @date 2020年4月4日 上午1:32:53
+ * @date 2020Year4Month4Sun AM1:32:53
  */
 public enum FlowNoticeType {
 	/**
-	 * 流程开始通知
+	 * Start Event Notify
 	 */
 	startNotice,
 	/**
-	 * 流程异常通知
+	 * Processing exception notification
 	 */
 	exceptionNotice,
 	/**
-	 * 流程结束通知
+	 * End of process notification
 	 */
 	endNotice
 

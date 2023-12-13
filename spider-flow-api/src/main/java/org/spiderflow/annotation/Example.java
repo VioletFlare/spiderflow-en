@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 该注解用来标注自定义的方法注释，用来页面代码案例
+ * The following attributes are available:，Code examples
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

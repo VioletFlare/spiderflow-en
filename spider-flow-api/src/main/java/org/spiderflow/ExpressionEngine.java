@@ -3,13 +3,13 @@ package org.spiderflow;
 import java.util.Map;
 
 /**
- * 表达式引擎
+ * Question Engine
  */
 public interface ExpressionEngine {
 
 	/**
-	 * 执行表达式
-	 * @param expression	表达式
+	 * Answer expression
+	 * @param expression	Answer
 	 * @param variables	变量
 	 * @return
 	 */

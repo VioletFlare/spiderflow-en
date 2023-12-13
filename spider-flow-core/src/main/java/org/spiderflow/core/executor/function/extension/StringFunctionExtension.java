@@ -26,116 +26,116 @@ public class StringFunctionExtension implements FunctionExtension{
 		return String.class;
 	}	
 	
-	@Comment("根据正则表达式提取String中的内容")
+	@Comment("Extract based on regular expressionStringTranslate the following text to english")
 	@Example("${strVar.regx('<title>(.*?)</title>')}")
 	public static String regx(String source,String pattern){
 		return ExtractUtils.getFirstMatcher(source, pattern, true);
 	}
 	
-	@Comment("根据正则表达式提取String中的内容")
+	@Comment("Extract based on regular expressionStringTranslate the following text to english")
 	@Example("${strVar.regx('<title>(.*?)</title>',1)}")
 	public static String regx(String source,String pattern,int groupIndex){
 		return ExtractUtils.getFirstMatcher(source, pattern, groupIndex);
 	}
 	
-	@Comment("根据正则表达式提取String中的内容")
+	@Comment("Extract based on regular expressionStringTranslate the following text to english")
 	@Example("${strVar.regx('<a href=\"(.*?)\">(.*?)</a>',[1,2])}")
 	public static List<String> regx(String source,String pattern,List<Integer> groups){
 		return ExtractUtils.getFirstMatcher(source, pattern, groups);
 	}
 	
-	@Comment("根据正则表达式提取String中的内容")
+	@Comment("Extract based on regular expressionStringTranslate the following text to english")
 	@Example("${strVar.regxs('<h2>(.*?)</h2>')}")
 	public static List<String> regxs(String source,String pattern){
 		return ExtractUtils.getMatchers(source, pattern, true);
 	}
 	
-	@Comment("根据正则表达式提取String中的内容")
+	@Comment("Extract based on regular expressionStringTranslate the following text to english")
 	@Example("${strVar.regxs('<h2>(.*?)</h2>',1)}")
 	public static List<String> regxs(String source,String pattern,int groupIndex){
 		return ExtractUtils.getMatchers(source, pattern, groupIndex);
 	}
 	
-	@Comment("根据正则表达式提取String中的内容")
+	@Comment("Extract based on regular expressionStringTranslate the following text to english")
 	@Example("${strVar.regxs('<a href=\"(.*?)\">(.*?)</a>',[1,2])}")
 	public static List<List<String>> regxs(String source,String pattern,List<Integer> groups){
 		return ExtractUtils.getMatchers(source, pattern, groups);
 	}
 	
-	@Comment("根据xpath在String变量中查找")
+	@Comment("Based onxpathOnString变量中查找")
 	@Example("${strVar.xpath('//title/text()')}")
 	@Return({Element.class,String.class})
 	public static String xpath(String source,String xpath){
 		return ExtractUtils.getValueByXPath(element(source), xpath);
 	}
 	
-	@Comment("根据xpath在String变量中查找")
+	@Comment("Based onxpathOnString变量中查找")
 	@Example("${strVar.xpaths('//a/@href')}")
 	public static List<String> xpaths(String source,String xpath){
 		return ExtractUtils.getValuesByXPath(element(source), xpath);
 	}
 	
-	@Comment("将String变量转为Element对象")
+	@Comment("EmailStringVariable converted toElement对象")
 	@Example("${strVar.element()}")
 	public static Element element(String source){
 		return Parser.xmlParser().parseInput(source,"");
 	}
 	
-	@Comment("根据css选择器提取")
+	@Comment("Based oncss选择器提取")
 	@Example("${strVar.selector('div > a')}")
 	public static Element selector(String source,String cssQuery){
 		return element(source).selectFirst(cssQuery);
 	}
 	
-	@Comment("根据css选择器提取")
+	@Comment("Based oncss选择器提取")
 	@Example("${strVar.selector('div > a')}")
 	public static Elements selectors(String source,String cssQuery){
 		return element(source).select(cssQuery);
 	}
 
-	@Comment("将string转为json对象")
+	@Comment("Emailstringtojson对象")
 	@Example("${strVar.json()}")
 	public static Object json(String source){
 		return JSON.parse(source);
 	}
 	
-	@Comment("根据jsonpath提取内容")
+	@Comment("Based onjsonpathExtract Contents")
 	@Example("${strVar.jsonpath('$.code')}")
 	public static Object jsonpath(String source,String jsonPath){
 		return ExtractUtils.getValueByJsonPath(json(source), jsonPath);
 	}
 	
-	@Comment("将字符串转为int类型")
+	@Comment("Turn string intointType")
 	@Example("${strVar.toInt(0)}")
 	public static Integer toInt(String source,int defaultValue){
 		return NumberUtils.toInt(source, defaultValue);
 	}
 	
-	@Comment("将字符串转为int类型")
+	@Comment("Turn string intointType")
 	@Example("${strVar.toInt()}")
 	public static Integer toInt(String source){
 		return NumberUtils.toInt(source);
 	}
 	
-	@Comment("将字符串转为double类型")
+	@Comment("Turn string intodoubleType")
 	@Example("${strVar.toDouble()}")
 	public static Double toDouble(String source){
 		return NumberUtils.toDouble(source);
 	}
 	
-	@Comment("将字符串转为long类型")
+	@Comment("Turn string intolongType")
 	@Example("${strVar.toLong()}")
 	public static Long toLong(String source){
 		return NumberUtils.toLong(source);
 	}
 	
-	@Comment("将字符串转为date类型")
+	@Comment("Turn string intodateType")
 	@Example("${strVar.toDate('yyyy-MM-dd HH:mm:ss')}")
 	public static Date toDate(String source,String pattern) throws ParseException{
 		return DateFunctionExecutor.parse(source, pattern);
 	}
 
-	@Comment("反转义字符串")
+	@Comment("Reverse string")
 	@Example("${strVar.unescape()}")
 	public static String unescape(String source){
 		return StringEscapeUtils.unescapeJava(source);

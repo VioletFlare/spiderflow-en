@@ -34,7 +34,7 @@ public class FlowNoticeService extends ServiceImpl<FlowNoticeMapper, FlowNotice>
 	private SpiderFlowMapper spiderFlowMapper;
 	@Autowired
 	private EmailUtils emailUtils;
-	@Value("${spider.notice.subject:spider-flow流程通知}")
+	@Value("${spider.notice.subject:spider-flowTranslation}")
 	private String subject;
 	@Value("${spider.notice.content.start}")
 	private String startContext;
@@ -46,18 +46,18 @@ public class FlowNoticeService extends ServiceImpl<FlowNoticeMapper, FlowNotice>
 	@Override
 	public boolean saveOrUpdate(FlowNotice entity) {
 		if (spiderFlowMapper.getCountById(entity.getId()) == 0) {
-			throw new RuntimeException("没有找到对应的流程");
+			throw new RuntimeException("No matching process found");
 		}
 		return super.saveOrUpdate(entity);
 	}
 
 	/**
-	 * 发送对应的流程通知
+	 * Send corresponding process notification
 	 * 
-	 * @param spiderFlow 流程信息
-	 * @param type       通知类型
+	 * @param spiderFlow Process Information
+	 * @param type       Notify type
 	 * @author BillDowney
-	 * @date 2020年4月4日 上午1:37:50
+	 * @date 2020Year4Month4Sun AM1:37:50
 	 */
 	public void sendFlowNotice(SpiderFlow spiderFlow, FlowNoticeType type) {
 		FlowNotice notice = baseMapper.selectById(spiderFlow.getId());
@@ -69,41 +69,41 @@ public class FlowNoticeService extends ServiceImpl<FlowNoticeMapper, FlowNotice>
 			case startNotice:
 				if (notice.judgeStartNotice()) {
 					content = startContext;
-					sendSubject += " - 流程开始执行";
+					sendSubject += " - The process is about to be executed";
 				}
 				break;
 			case endNotice:
 				if (notice.judgeEndNotice()) {
 					content = endContext;
-					sendSubject += " - 流程执行完毕";
+					sendSubject += " - Process completed";
 				}
 				break;
 			case exceptionNotice:
 				if (notice.judgeExceptionNotice()) {
 					content = exceptionContext;
-					sendSubject += " - 流程发生异常";
+					sendSubject += " - There was an error while trying to print the list of tasks: %s";
 				}
 				break;
 			}
 			if (StringUtils.isEmpty(content)) {
 				return;
 			}
-			// 定义一个上下文变量
+			// Define a contextual variable
 			Map<String, Object> variables = new HashMap<String, Object>();
-			// 放入流程信息
+			// Add Process Information
 			BeanMap beanMap = BeanMap.create(spiderFlow);
 			for (Object key : beanMap.keySet()) {
 				variables.put(key + "", beanMap.get(key));
 			}
-			// 放入当前时间
+			// Enter the current time
 			variables.put("currentDate", this.getCurrentDate());
 			content = ExpressionUtils.execute(content.replaceAll("[{]", "\\${"), variables) + "";
-			// 整理收件人
+			// Organize Recipients
 			String recipients = notice.getRecipients();
 			for (String recipient : recipients.split(",")) {
 				String noticeWay = notice.getNoticeWay();
 				String people = recipient;
-				// 如果含有":"证明单独配置了发送方式
+				// If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.":"Show that the transmitting mode is set separately
 				if (recipient.contains(":")) {
 					String[] strs = recipient.split(":");
 					noticeWay = strs[0];

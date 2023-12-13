@@ -11,14 +11,14 @@ import org.springframework.stereotype.Component;
  * @author Octopus
  */
 @Component
-@Comment("thread常用方法")
+@Comment("threadCommon Methods")
 public class ThreadFunctionExecutor implements FunctionExecutor {
     @Override
     public String getFunctionPrefix() {
         return "thread";
     }
 
-    @Comment("线程休眠")
+    @Comment("Threads")
     @Example("${thread.sleep(1000L)}")
     public static void sleep(Long sleepTime){
         try {

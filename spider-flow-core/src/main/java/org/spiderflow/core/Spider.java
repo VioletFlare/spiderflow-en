@@ -34,7 +34,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 爬虫的核心类
+ * Bugzilla's core class
  *
  * @author jmxd
  */
@@ -72,10 +72,10 @@ public class Spider {
 			variables = new HashMap<>();
 		}
 		SpiderNode root = SpiderFlowUtils.loadXMLFromString(spiderFlow.getXml());
-		// 流程开始通知
+		// Start Event Notify
 		flowNoticeService.sendFlowNotice(spiderFlow, FlowNoticeType.startNotice);
 		executeRoot(root, context, variables);
-		// 流程结束通知
+		// End of process notification
 		flowNoticeService.sendFlowNotice(spiderFlow, FlowNoticeType.endNotice);
 		return context.getOutputs();
 	}
@@ -85,33 +85,33 @@ public class Spider {
 	}
 
 	public void runWithTest(SpiderNode root, SpiderContext context) {
-		//将上下文存到ThreadLocal里，以便后续使用
+		//Save Context toThreadLocal里，This information will be used to populate the 'Cc' field of the email.
 		SpiderContextHolder.set(context);
-		//死循环检测的计数器（死循环检测只在测试时有效）
+		//Counter for Death Rattle checks（The death spiral check only works when you are in test mode.）
 		AtomicInteger executeCount = new AtomicInteger(0);
-		//存入到上下文中，以供后续检测
+		//Save to Context，For follow-up inspection
 		context.put(ATOMIC_DEAD_CYCLE, executeCount);
-		//执行根节点
+		//Answer node
 		executeRoot(root, context, new HashMap<>());
-		//当爬虫任务执行完毕时,判断是否超过预期
+		//When the debugging task has finished,判断是否超过预期
 		if (executeCount.get() > deadCycle) {
-			logger.error("检测到可能出现死循环,测试终止");
+			logger.error("Detected possible death loop, aborting,Test canceled");
 		} else {
-			logger.info("测试完毕！");
+			logger.info("Test Complete！");
 		}
-		//将上下文从ThreadLocal移除，防止内存泄漏
+		//Will O The WispThreadLocalRemove，Prevent memory leaks
 		SpiderContextHolder.remove();
 	}
 
 	/**
-	 * 执行根节点
+	 * Answer node
 	 */
 	private void executeRoot(SpiderNode root, SpiderContext context, Map<String, Object> variables) {
-		//获取当前流程执行线程数
+		//Get the number of currently running process threads
 		int nThreads = NumberUtils.toInt(root.getStringJsonValue(ShapeExecutor.THREAD_COUNT), defaultThreads);
 		String strategy = root.getStringJsonValue("submit-strategy");
 		ThreadSubmitStrategy submitStrategy;
-		//选择提交策略，这里一定要使用new,不能与其他实例共享
+		//Choose Submission Strategy，Here you have to usenew,Cannot share with other instances
 		if("linked".equalsIgnoreCase(strategy)){
 			submitStrategy = new LinkedThreadSubmitStrategy();
 		}else if("child".equalsIgnoreCase(strategy)){
@@ -121,25 +121,25 @@ public class Spider {
 		}else{
 			submitStrategy = new RandomThreadSubmitStrategy();
 		}
-		//创建子线程池，采用一父多子的线程池,子线程数不能超过总线程数（超过时进入队列等待）,+1是因为会占用一个线程用来调度执行下一级
+		//Create child thread pool，Use one thread per child,Warning: Too many subthreads for a total of threads（Enter queue and wait）,+1It is because it takes one thread to schedule the next level
 		SubThreadPoolExecutor pool = executorInstance.createSubThreadPoolExecutor(Math.max(nThreads,1) + 1,submitStrategy);
 		context.setRootNode(root);
 		context.setThreadPool(pool);
-		//触发监听器
+		//Trigger Listener
 		if (listeners != null) {
 			listeners.forEach(listener -> listener.beforeStart(context));
 		}
 		Comparator<SpiderNode> comparator = submitStrategy.comparator();
-		//启动一个线程开始执行任务,并监听其结束并执行下一级
+		//Start a thread to perform a task,and monitor its completion and carry out the next level
 		Future<?> f = pool.submitAsync(TtlRunnable.get(() -> {
 			try {
-				//执行具体节点
+				//Answer
 				Spider.this.executeNode(null, root, context, variables);
 				Queue<Future<?>> queue = context.getFutureQueue();
-				//循环从队列中获取Future,直到队列为空结束,当任务完成时，则执行下一级
+				//Get help from a team memberFuture,Until the queue is empty,When a task is completed，Then execute the next level
 				while (!queue.isEmpty()) {
 					try {
-						//TODO 这里应该是取出最先执行完毕的任务
+						//TODO Here you can see the list of all your tasks.
 						Optional<Future<?>> max = queue.stream().filter(Future::isDone).max((o1, o2) -> {
 							try {
 								return comparator.compare(((SpiderTask) o1.get()).node, ((SpiderTask) o2.get()).node);
@@ -148,43 +148,43 @@ public class Spider {
 							return 0;
 
 						});
-						if (max.isPresent()) {	//判断任务是否完成
+						if (max.isPresent()) {	//Are we done?
 							queue.remove(max.get());
-							if (context.isRunning()) {	//检测是否运行中(当在页面中点击"停止"时,此值为false,其余为true)
+							if (context.isRunning()) {	//Check if running(When you click on the page"Stop"时,This value isfalse,Other =true)
 								SpiderTask task = (SpiderTask) max.get().get();
-								task.node.decrement();	//任务执行完毕,计数器减一(该计数器是给Join节点使用)
-								if (task.executor.allowExecuteNext(task.node, context, task.variables)) {	//判断是否允许执行下一级
+								task.node.decrement();	//任务执行完毕,Counter decreased by one(This counter is forJoinUse a countdown)
+								if (task.executor.allowExecuteNext(task.node, context, task.variables)) {	//Next level
 									logger.debug("执行节点[{}:{}]完毕", task.node.getNodeName(), task.node.getNodeId());
-									//执行下一级
+									//Execute Next Level
 									Spider.this.executeNextNodes(task.node, context, task.variables);
 								} else {
-									logger.debug("执行节点[{}:{}]完毕，忽略执行下一节点", task.node.getNodeName(), task.node.getNodeId());
+									logger.debug("执行节点[{}:{}]完毕，Ignore next node", task.node.getNodeName(), task.node.getNodeId());
 								}
 							}
 						}
-						//睡眠1ms,让出cpu
+						//Sleep1ms,Exitcpu
 						Thread.sleep(1);
 					} catch (InterruptedException ignored) {
 					} catch (Throwable t){
-						logger.error("程序发生异常",t);
+						logger.error("Application crashed",t);
 					}
 				}
-				//等待线程池结束
+				//Waiting for thread pool to complete
 				pool.awaitTermination();
 			} finally {
-				//触发监听器
+				//Trigger Listener
 				if (listeners != null) {
 					listeners.forEach(listener -> listener.afterEnd(context));
 				}
 			}
 		}), null, root);
 		try {
-			f.get();	//阻塞等待所有任务执行完毕
+			f.get();	//Block until all tasks have completed
 		} catch (InterruptedException | ExecutionException ignored) {}
 	}
 
 	/**
-	 * 执行下一级节点
+	 * Execute Next Level
 	 */
 	private void executeNextNodes(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		List<SpiderNode> nextNodes = node.getNextNodes();
@@ -204,20 +204,20 @@ public class Spider {
 			executeNextNodes(node, context, variables);
 			return;
 		}
-		//判断箭头上的条件，如果不成立则不执行
+		//Determine conditions for the arrow shot，If true, show the banner message
 		if (!executeCondition(fromNode, node, variables, context)) {
 			return;
 		}
 		logger.debug("执行节点[{}:{}]", node.getNodeName(), node.getNodeId());
-		//找到对应的执行器
+		//Find matching device
 		ShapeExecutor executor = ExecutorsUtils.get(shape);
 		if (executor == null) {
-			logger.error("执行失败,找不到对应的执行器:{}", shape);
+			logger.error("Failed to execute,Find an iPod failed:{}", shape);
 			context.setRunning(false);
 		}
-		int loopCount = 1;	//循环次数默认为1,如果节点有循环属性且填了循环次数/集合,则取出循环次数
-		int loopStart = 0;	//循环起始位置
-		int loopEnd = 1;	//循环结束位置
+		int loopCount = 1;	//Default Number of Cycles1,If the node has a cycle property and a cycle count/Conversation,Remove the selected card from the deck
+		int loopStart = 0;	//Start counter at:
+		int loopEnd = 1;	//End of cycle position
 		String loopCountStr = node.getStringJsonValue(ShapeExecutor.LOOP_COUNT);
 		Object loopArray = null;
 		boolean isLoop = false;
@@ -245,49 +245,49 @@ public class Spider {
 						loopEnd = Math.max(loopEnd + end + 1,0);
 					}
 				}
-				logger.info("获取循环次数{}={}", loopCountStr, loopCount);
+				logger.info("Get the number of cycles{}={}", loopCountStr, loopCount);
 			} catch (Throwable t) {
 				loopCount = 0;
-				logger.error("获取循环次数失败,异常信息：{}", t);
+				logger.error("Failed to get loop count,Anomalous messages：{}", t);
 			}
 		}
 		if (loopCount > 0) {
-			//获取循环下标的变量名称
+			//Get the value of a cycle counter
 			String loopVariableName = node.getStringJsonValue(ShapeExecutor.LOOP_VARIABLE_NAME);
 			String loopItem = node.getStringJsonValue(LoopExecutor.LOOP_ITEM,"item");
 			List<SpiderTask> tasks = new ArrayList<>();
 			for (int i = loopStart; i < loopEnd; i++) {
-				node.increment();	//节点执行次数+1(后续Join节点使用)
+				node.increment();	//Number of times to execute the node+1(Follow UpJoinUse a countdown)
 				if (context.isRunning()) {
 					Map<String, Object> nVariables = new HashMap<>();
-					// 判断是否需要传递变量
+					// Determine if a variable should be transmitted
 					if(fromNode == null || node.isTransmitVariable(fromNode.getNodeId())){
 						nVariables.putAll(variables);
 					}
 					if(isLoop){
-						// 存入下标变量
+						// Save subvariable
 						if (!StringUtils.isBlank(loopVariableName)) {
 							nVariables.put(loopVariableName, i);
 						}
-						// 存入item
+						// Saveitem
 						nVariables.put(loopItem,loopArray == null ? i : Array.get(loopArray, i));
 					}
 					tasks.add(new SpiderTask(TtlRunnable.get(() -> {
 						if (context.isRunning()) {
 							try {
-								//死循环检测，当执行节点次数大于阈值时，结束本次测试
+								//Text to translate: D-Bus Call，When to execute the child instead of the parent，Thank you for taking this survey.
 								AtomicInteger executeCount = context.get(ATOMIC_DEAD_CYCLE);
 								if (executeCount != null && executeCount.incrementAndGet() > deadCycle) {
 									context.setRunning(false);
 									return;
 								}
-								//执行节点具体逻辑
+								//Execute specific logic
 								executor.execute(node, context, nVariables);
-								//当未发生异常时，移除ex变量
+								//When no exception occurs，Removeex变量
 								nVariables.remove("ex");
 							} catch (Throwable t) {
 								nVariables.put("ex", t);
-								logger.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), t);
+								logger.error("执行节点[{}:{}]Error,Anomalous messages：{}", node.getNodeName(), node.getNodeId(), t);
 							}
 						}
 					}), node, nVariables, executor));
@@ -295,8 +295,8 @@ public class Spider {
 			}
 			LinkedBlockingQueue<Future<?>> futureQueue = context.getFutureQueue();
 			for (SpiderTask task : tasks) {
-				if(executor.isThread()){	//判断节点是否是异步运行
-					//提交任务至线程池中,并将Future添加到队列末尾
+				if(executor.isThread()){	//Is the node running in async mode?
+					//Submit Task to Queue,andFutureAdd to the end of the queue
 					futureQueue.add(context.getThreadPool().submitAsync(task.runnable, task, node));
 				}else{
 					FutureTask<SpiderTask> futureTask = new FutureTask<>(task.runnable, task);
@@ -308,24 +308,24 @@ public class Spider {
 	}
 
 	/**
-	 *	判断箭头上的表达式是否成立
+	 *	If you don't know the answer to a question, please don't share false information.
 	 */
 	private boolean executeCondition(SpiderNode fromNode, SpiderNode node, Map<String, Object> variables, SpiderContext context) {
 		if (fromNode != null) {
 			boolean hasException = variables.get("ex") != null;
 			String exceptionFlow = node.getExceptionFlow(fromNode.getNodeId());
-			//当出现异常流转 : 1
+			//When an abnormal flow occurs : 1
 			//未出现异常流转 : 2
 			if(("1".equalsIgnoreCase(exceptionFlow) && !hasException) || ("2".equalsIgnoreCase(exceptionFlow) && hasException)){
 				return false;
 			}
 			String condition = node.getCondition(fromNode.getNodeId());
-			if (StringUtils.isNotBlank(condition)) { // 判断是否有条件
+			if (StringUtils.isNotBlank(condition)) { // If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.
 				Object result = null;
 				try {
 					result = ExpressionUtils.execute(condition, variables);
 				} catch (Exception e) {
-					logger.error("判断{}出错,异常信息：{}", condition, e);
+					logger.error("判断{}Error,Anomalous messages：{}", condition, e);
 				}
 				if (result != null) {
 					boolean isContinue = "true".equals(result) || Objects.equals(result, true);

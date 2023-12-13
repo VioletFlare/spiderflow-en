@@ -18,19 +18,19 @@ public class ListFunctionExtension implements FunctionExtension{
 		return List.class;
 	}
 	
-	@Comment("获取list的长度")
+	@Comment("GetlistThe length of the text")
 	@Example("${listVar.length()}")
 	public static int length(List<?> list){
 		return list.size();
 	}
 	
-	@Comment("将list拼接起来")
+	@Comment("Emaillist拼接起来")
 	@Example("${listVar.join()}")
 	public static String join(List<?> list){
 		return StringUtils.join(list.toArray());
 	}
 	
-	@Comment("将list用separator拼接起来")
+	@Comment("Emaillist用separator拼接起来")
 	@Example("${listVar.join('-')}")
 	public static String join(List<?> list,String separator){
 		if(list.size() == 1){
@@ -40,14 +40,14 @@ public class ListFunctionExtension implements FunctionExtension{
 		}
 	}
 
-	@Comment("将list<String>排序")
+	@Comment("Emaillist<String>Sort")
 	@Example("${listVar.sort()}")
 	public static List<String> sort(List<String> list){
 		Collections.sort(list);
 		return list;
 	}
 
-	@Comment("将list打乱顺序")
+	@Comment("EmaillistConfiguration")
 	@Example("${listVar.shuffle()}")
 	public static List<?> shuffle(List<?> list){
 		Collections.shuffle(list);

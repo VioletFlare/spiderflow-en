@@ -18,7 +18,7 @@ public class ObjectFunctionExtension implements FunctionExtension{
 		return Object.class;
 	}
 	
-	@Comment("将对象转为string类型")
+	@Comment("Object TostringType")
 	@Example("${objVar.string()}")
 	public static String string(Object obj){
 		if (obj instanceof String) {
@@ -27,7 +27,7 @@ public class ObjectFunctionExtension implements FunctionExtension{
 		return Objects.toString(obj);
 	}
 	
-	@Comment("根据jsonpath提取内容")
+	@Comment("Based onjsonpathExtract Contents")
 	@Example("${objVar.jsonpath('$.code')}")
 	public static Object jsonpath(Object obj,String path){
 		if(obj instanceof String){
@@ -36,7 +36,7 @@ public class ObjectFunctionExtension implements FunctionExtension{
 		return ExtractUtils.getValueByJsonPath(obj, path);
 	}
 
-	@Comment("睡眠等待一段时间")
+	@Comment("Sleep for a while")
 	@Example("${objVar.sleep(1000)}")
 	public static Object sleep(Object obj, int millis) {
 		try {

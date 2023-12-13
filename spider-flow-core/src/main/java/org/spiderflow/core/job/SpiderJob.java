@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 爬虫定时执行
+ * Sticky Note Properties
  *
  * @author Administrator
  */
@@ -79,11 +79,11 @@ public class SpiderJob extends QuartzJobBean {
 			context = SpiderJobContext.create(this.workspace, spiderFlow.getId(),task.getId(),false);
 			SpiderContextHolder.set(context);
 			contextMap.put(task.getId(), context);
-			logger.info("开始执行任务{}", spiderFlow.getName());
+			logger.info("Start Assignment{}", spiderFlow.getName());
 			spider.run(spiderFlow, context);
-			logger.info("执行任务{}完毕，下次执行时间：{}", spiderFlow.getName(), nextExecuteTime == null ? null : DateFormatUtils.format(nextExecuteTime, "yyyy-MM-dd HH:mm:ss"));
+			logger.info("执行任务{}完毕，Next execution time：{}", spiderFlow.getName(), nextExecuteTime == null ? null : DateFormatUtils.format(nextExecuteTime, "yyyy-MM-dd HH:mm:ss"));
 		} catch (Exception e) {
-			logger.error("执行任务{}出错", spiderFlow.getName(), e);
+			logger.error("执行任务{}Error", spiderFlow.getName(), e);
 		} finally {
 			if (context != null) {
 				context.close();

@@ -60,10 +60,10 @@ public class DataSourceController {
 	@RequestMapping("/test")
 	public JsonBean<Void> test(DataSource dataSource){
 		if(StringUtils.isBlank(dataSource.getDriverClassName())){
-			return new JsonBean<>(0, "DriverClassName不能为空！");
+			return new JsonBean<>(0, "DriverClassNameCannot be empty！");
 		}
 		if(StringUtils.isBlank(dataSource.getJdbcUrl())){
-			return new JsonBean<>(0, "jdbcUrl不能为空！");
+			return new JsonBean<>(0, "jdbcUrlCannot be empty！");
 		}
 		Connection connection = null;
 		try {
@@ -76,11 +76,11 @@ public class DataSourceController {
 			}else{
 				connection = DriverManager.getConnection(url);
 			}
-			return new JsonBean<>(1, "测试连接成功");
+			return new JsonBean<>(1, "Test connection successful");
 		} catch (ClassNotFoundException e) {
-			return new JsonBean<>(0, "找不到驱动包：" + dataSource.getDriverClassName());
+			return new JsonBean<>(0, "Find not the driver package：" + dataSource.getDriverClassName());
 		} catch (Exception e){
-			return new JsonBean<>(0, "连接失败，"+ e.getMessage());
+			return new JsonBean<>(0, "The connection to the server has failed.，"+ e.getMessage());
 		} finally{
 			if(connection != null){
 				try {

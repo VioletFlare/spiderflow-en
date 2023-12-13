@@ -33,7 +33,7 @@ public class AstInterpreter {
 			if (t instanceof TemplateException)
 				throw (TemplateException)t;
 			else {
-				ExpressionError.error("执行表达式出错 " + t.getMessage(), template.getNodes().get(0).getSpan(),t);
+				ExpressionError.error("Executing expression errors " + t.getMessage(), template.getNodes().get(0).getSpan(),t);
 				return null; // never reached
 			}
 		} 
@@ -57,7 +57,7 @@ public class AstInterpreter {
 				}
 				result += value;
 			}else if(i + 1 < n){
-				ExpressionError.error("表达式执行错误", node.getSpan());
+				ExpressionError.error("The expression to evaluate", node.getSpan());
 			}else{
 				return value;
 			}

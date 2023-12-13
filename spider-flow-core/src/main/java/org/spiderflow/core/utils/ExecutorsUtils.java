@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class ExecutorsUtils implements ApplicationContextAware {
 
     /**
-     * 节点执行器列表 当前爬虫的全部流程
+     * List of active plugins Currently edited file name
      */
     private static List<ShapeExecutor> executors;
 

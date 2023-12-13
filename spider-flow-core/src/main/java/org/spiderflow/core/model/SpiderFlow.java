@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
 
 /**
- * 爬虫持久化实体类
+ * Crawling Persistent Entities
  */
 @TableName("sp_flow")
 public class SpiderFlow {
@@ -17,14 +17,14 @@ public class SpiderFlow {
     private String id;
 
     /**
-     * 定时任务表达式
+     * Scheduled Task Expression
      */
     private String cron;
 
     private String name;
 
     /**
-     * xml流程图
+     * xmlProcess Diagram
      */
     private String xml;
 
@@ -37,7 +37,7 @@ public class SpiderFlow {
     private Date nextExecuteTime;
 
     /**
-     * 定时执行的执行次数
+     * Next run:
      */
     private Integer executeCount;
 
