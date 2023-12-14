@@ -8,9 +8,9 @@ CREATE TABLE `sp_flow` (
   `id` varchar(32) NOT NULL,
   `name` varchar(64) DEFAULT NULL COMMENT 'Assistant Phone',
   `xml` longtext DEFAULT NULL COMMENT 'xmlAnswer',
-  `cron` varchar(255) DEFAULT NULL COMMENT 'cornAnswer',
+  `cron` varchar(255) DEFAULT NULL COMMENT 'cronAnswer',
   `enabled` char(1) DEFAULT '0' COMMENT 'Is the task started,Default Unstarted',
-  `create_date` datetime DEFAULT CURRENT_TIMESTAMP  COMMENT 'Answer the following questions as honestly as possible. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.',
+  `create_date` datetime DEFAULT CURRENT_TIMESTAMP  COMMENT 'create date',
   `last_execute_time` datetime DEFAULT NULL  COMMENT 'Next time the reminder is triggered',
   `next_execute_time` datetime DEFAULT NULL   COMMENT 'Next execution time',
   `execute_count` int(8) DEFAULT NULL  COMMENT 'Next scheduled execution time',
@@ -37,10 +37,10 @@ CREATE TABLE `sp_datasource` (
 DROP TABLE IF EXISTS `sp_variable`;
 CREATE TABLE `sp_variable` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(32) DEFAULT NULL COMMENT '变量名',
-  `value` varchar(512) DEFAULT NULL COMMENT '变量值',
-  `description` varchar(255) DEFAULT NULL COMMENT '变量描述',
-  `create_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Answer the following questions as honestly as possible. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.',
+  `name` varchar(32) DEFAULT NULL COMMENT 'variable name',
+  `value` varchar(512) DEFAULT NULL COMMENT 'variable',
+  `description` varchar(255) DEFAULT NULL COMMENT 'Variable description',
+  `create_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create date',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
 
@@ -53,7 +53,6 @@ CREATE TABLE `sp_task` (
   `end_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
-
 /* v0.4.0 Add */
 DROP TABLE IF EXISTS `sp_function`;
 CREATE TABLE `sp_function`  (
