@@ -16,6 +16,15 @@
 ## Introduction
 The platform defines the crawler in a flow charting way,是一个高度灵活可配置的爬虫平台
 
+## Build & Run
+
+```
+    cd spiderflow-en
+    mvn package
+    sudo docker build --no-cache -t spiderflow .
+    docker run --rm -it --network="host" spiderflow
+```
+
 ## Features
 - [x] SupportXpath/JsonPath/css选择器/Regex Match/What is your desired Jabber password?
 - [x] SupportJSON/XML/Binary format
