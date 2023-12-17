@@ -232,7 +232,7 @@ $(function(){
 			serializeForm();
 		});
 		layui.table.on('tool',function(obj){
-			layui.layer.confirm('Are you sure you want to delete the meeting titled '{0}'?？',{
+			layui.layer.confirm("Are you sure you want to delete the meeting titled '{0}'?",{
 				title : '12'
 			},function(index) {
 				obj.del();
