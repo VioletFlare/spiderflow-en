@@ -22,7 +22,7 @@ The platform defines the crawler in a flow charting way,是一个高度灵活可
 cd spiderflow-en
 mvn package
 sudo docker build --no-cache -t spiderflow .
-docker run --rm -it --network="host" spiderflow
+sudo docker run --rm -it --network="host" spiderflow
 ```
 
 ## Features
