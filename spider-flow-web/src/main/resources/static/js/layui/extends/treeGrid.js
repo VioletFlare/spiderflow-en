@@ -1197,7 +1197,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form'], function(exports){
 
     /**
      * Reset current form data（1、List Itemize；2Tree Table）
-     * Convert list data to tree structure and complianttableAnswer the following questions as honestly as possible. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.
+     * Convert list data to tree structure and complianttable
      * @param list          List Data
      * @param field_Id      Keywords
      * @param field_upId    Classify Message as & Spam
