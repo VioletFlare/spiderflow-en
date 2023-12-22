@@ -7,7 +7,6 @@ import java.util.Map;
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
-import org.jsoup.Jsoup;
 
 /**
  * Request object packaging class
@@ -23,7 +22,7 @@ public class HttpRequest {
 	}
 	
 	public HttpRequest url(String url){
-		this.connection = Jsoup.connect(url);
+		this.connection = SSLHelper.getConnection(url);
 		this.connection.method(Method.GET);
 		this.connection.timeout(60000);
 		return this;
@@ -109,12 +108,6 @@ public class HttpRequest {
 	
 	public HttpRequest proxy(String host,int port){
 		this.connection.proxy(host, port);
-		return this;
-	}
-	
-	@SuppressWarnings("deprecation")
-	public HttpRequest validateTLSCertificates(boolean value){
-		this.connection.validateTLSCertificates(value);
 		return this;
 	}
 	

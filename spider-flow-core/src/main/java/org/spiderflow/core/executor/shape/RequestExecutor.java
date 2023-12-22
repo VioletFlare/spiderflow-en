@@ -183,11 +183,6 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 			request.followRedirect(followRedirects);
 			logger.debug("Set Up Follow Up Redirect：{}", followRedirects);
 
-			//Are you sure you want to delete the meeting titled '{0}'?TLSCertificate,默认是验证
-			if("0".equals(node.getStringJsonValue(TLS_VALIDATE))){
-				request.validateTLSCertificates(false);
-				logger.debug("1 hour before appointmentTLSCertificate Authentication：{}", false);
-			}
 			SpiderNode root = context.getRootNode();
 			//Setup Requestheader
 			setRequestHeader(root, request, root.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);
