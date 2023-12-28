@@ -1,12 +1,13 @@
 
 package org.spiderflow.core.expression;
 
+import org.spiderflow.core.expression.TemplateLoader.Source;
 import org.spiderflow.core.expression.parsing.Span;
-import org.spiderflow.core.expression.parsing.Span.Line;
 import org.spiderflow.core.expression.parsing.TokenStream;
+import org.spiderflow.core.expression.parsing.Span.Line;
 
 /** All errors reported by the library go through the static functions of this class. */
-public class ExpressionError {
+public class Error {
 
 	/**
 	 * <p>
@@ -23,11 +24,11 @@ public class ExpressionError {
 		if (stream.hasMore())
 			error(message, stream.consume().getSpan());
 		else {
-			String source = stream.getSource();
+			Source source = stream.getSource();
 			if (source == null)
-				error(message, new Span(" ", 0, 1));
+				error(message, new Span(new Source("unknown", " "), 0, 1));
 			else
-				error(message, new Span(source, source.length() - 1, source.length()));
+				error(message, new Span(source, source.getContent().length() - 1, source.getContent().length()));
 		}
 	}
 
@@ -36,7 +37,7 @@ public class ExpressionError {
 	public static void error (String message, Span location, Throwable cause) {
 
 		Line line = location.getLine();
-		message = "Error (" + line.getLineNumber() + "): " + message + "\n\n";
+		message = "Error (" + location.getSource().getPath() + ":" + line.getLineNumber() + "): " + message + "\n\n";
 		message += line.getText();
 		message += "\n";
 
@@ -59,7 +60,7 @@ public class ExpressionError {
 		error(message, location, null);
 	}
 
-	/** Exception thrown by all basis-template code via {@link ExpressionError#error(String, Span)}. In case an error happens deep inside a
+	/** Exception thrown by all basis-template code via {@link Error#error(String, Span)}. In case an error happens deep inside a
 	 * list of included templates, the {@link #getMessage()} method will return a condensed error message. **/
 	public static class TemplateException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
@@ -108,11 +109,5 @@ public class ExpressionError {
 			}
 			return builder.toString();
 		}
-	}
-	
-	public static class StringLiteralException extends RuntimeException {
-
-		private static final long serialVersionUID = 1L;
-		
 	}
 }

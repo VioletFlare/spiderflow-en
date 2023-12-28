@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class JavaReflection extends Reflection {
-	private final Map<Class<?>, Map<String, Field>> fieldCache = new ConcurrentHashMap<Class<?>, Map<String, Field>>();
-	private final Map<Class<?>, Map<JavaReflection.MethodSignature, Method>> methodCache = new ConcurrentHashMap<Class<?>, Map<JavaReflection.MethodSignature, Method>>();
-	private final Map<Class<?>, Map<String,List<Method>>> extensionmethodCache = new ConcurrentHashMap<>();
-
+	@SuppressWarnings("rawtypes") private final Map<Class, Map<String, Field>> fieldCache = new ConcurrentHashMap<Class, Map<String, Field>>();
+	@SuppressWarnings("rawtypes") private final Map<Class, Map<JavaReflection.MethodSignature, Method>> methodCache = new ConcurrentHashMap<Class, Map<JavaReflection.MethodSignature, Method>>();
+	@SuppressWarnings("rawtypes") private final static Map<Class<?>, Map<String,List<Method>>> extensionmethodCache = new ConcurrentHashMap<>();
+	
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getField (Object obj, String name) {
@@ -63,81 +63,20 @@ public class JavaReflection extends Reflection {
 			throw new RuntimeException("Couldn't get value of field '" + javaField.getName() + "' from object of type '" + obj.getClass().getSimpleName() + "'");
 		}
 	}
-	
-	@Override
-	public void registerExtensionClass(Class<?> target,Class<?> clazz){
-		Method[] methods = clazz.getDeclaredMethods();
-		if(methods != null){
-			Map<String, List<Method>> cachedMethodMap = extensionmethodCache.get(target);
-			if(cachedMethodMap == null){
-				cachedMethodMap = new HashMap<>();
-				extensionmethodCache.put(target,cachedMethodMap);
-			}
-			for (Method method : methods) {
-				if(Modifier.isStatic(method.getModifiers()) && method.getParameterCount() > 0){
-					List<Method> cachedList = cachedMethodMap.get(method.getName());
-					if(cachedList == null){
-						cachedList = new ArrayList<>();
-						cachedMethodMap.put(method.getName(), cachedList);
-					}
-					cachedList.add(method);
-				}
-			}
-		}
-	}
-	
-	@Override
-	public Object getExtensionMethod(Object obj, String name, Object... arguments) {
-		Class<?> cls = obj instanceof Class ? (Class<?>)obj : obj.getClass();
-		if(cls.isArray()){
-			cls = Object[].class;
-		}
-		return getExtensionMethod(cls,name,arguments);
-	}
-	
-	private Object getExtensionMethod(Class<?> cls, String name, Object... arguments) {
-		if(cls == null){
-			cls = Object.class;
-		}
-		Map<String, List<Method>> methodMap = extensionmethodCache.get(cls);
-		if(methodMap != null){
-			List<Method> methodList = methodMap.get(name);
-			if(methodList != null){
-				Class<?>[] parameterTypes = new Class[arguments.length + 1];
-				parameterTypes[0] = cls;
-				for (int i = 0; i < arguments.length; i++) {
-					parameterTypes[i + 1] = arguments[i] == null ? null : arguments[i].getClass();
-				}
-				return findMethod(methodList, parameterTypes);
-			}
-		}
-		if(cls != Object.class){
-			Class<?>[] interfaces = cls.getInterfaces();
-			if(interfaces != null){
-				for (Class<?> clazz : interfaces) {
-					Object method = getExtensionMethod(clazz,name,arguments);
-					if(method != null){
-						return method;
-					}
-				}
-			}
-			return getExtensionMethod(cls.getSuperclass(),name,arguments);
-		}
-		return null;
-	}
 
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
 	public Object getMethod (Object obj, String name, Object... arguments) {
-		Class<?> cls = obj instanceof Class ? (Class<?>)obj : obj.getClass();
+		Class cls = obj instanceof Class ? (Class)obj : obj.getClass();
 		Map<JavaReflection.MethodSignature, Method> methods = methodCache.get(cls);
 		if (methods == null) {
 			methods = new ConcurrentHashMap<JavaReflection.MethodSignature, Method>();
 			methodCache.put(cls, methods);
 		}
 
-		Class<?>[] parameterTypes = new Class[arguments.length];
+		Class[] parameterTypes = new Class[arguments.length];
 		for (int i = 0; i < arguments.length; i++) {
-			parameterTypes[i] = arguments[i] == null ? null : arguments[i].getClass();
+			parameterTypes[i] = arguments[i] == null ? Object.class : arguments[i].getClass();
 		}
 
 		JavaReflection.MethodSignature signature = new MethodSignature(name, parameterTypes);
@@ -145,22 +84,22 @@ public class JavaReflection extends Reflection {
 
 		if (method == null) {
 			try {
-				if (name == null) {
-					method = findApply(cls);
-				} else {
-					method = findMethod(cls, name, parameterTypes);
-					if(method == null && parameterTypes != null){
-						method = findMethod(cls, name, new Class<?>[]{Object[].class});
+				if (Modifier.isPublic(cls.getModifiers())) {
+					if (name == null) {
+						method = findApply(cls);
+					} else {
+						method = findMethod(cls, name, parameterTypes);
 					}
+
+					method.setAccessible(true);
+					methods.put(signature, method);
 				}
-				method.setAccessible(true);
-				methods.put(signature, method);
 			} catch (Throwable e) {
 				// fall through
 			}
 
 			if (method == null) {
-				Class<?> parentClass = cls.getSuperclass();
+				Class parentClass = cls.getSuperclass();
 				while (parentClass != Object.class && parentClass != null) {
 					try {
 						if (name == null)
@@ -176,33 +115,50 @@ public class JavaReflection extends Reflection {
 					parentClass = parentClass.getSuperclass();
 				}
 			}
+
+			if (method == null) {
+				Class[] interfaces = cls.getInterfaces();
+				for (Class itf : interfaces) {
+					if (name == null)
+						method = findApply(itf);
+					else {
+						method = findMethod(itf, name, parameterTypes);
+					}
+					if (method != null) break;
+				}
+			}
 		}
 
 		return method;
 	}
 
 	/** Returns the <code>apply()</code> method of a functional interface. **/
-	private static Method findApply (Class<?> cls) {
+	private static Method findApply (Class cls) {
 		for (Method method : cls.getDeclaredMethods()) {
 			if (method.getName().equals("apply")) return method;
 		}
 		return null;
 	}
 
-	private static Method findMethod (List<Method> methods, Class<?>[] parameterTypes) {
+	/** Returns the method best matching the given signature, including type coercion, or null. **/
+	private static Method findMethod (Class cls, String name, Class[] parameterTypes) {
+		Method[] methods = cls.getDeclaredMethods();
 		Method foundMethod = null;
 		int foundScore = 0;
-		for (Method method : methods) {
+		for (int i = 0, n = methods.length; i < n; i++) {
+			Method method = methods[i];
+
+			// if neither name or parameter list size match, bail on this method
+			if (!method.getName().equals(name)) continue;
+			if (method.getParameterTypes().length != parameterTypes.length) continue;
+
 			// Check if the types match.
-			Class<?>[] otherTypes = method.getParameterTypes();
-			if(parameterTypes.length != otherTypes.length){
-				continue;
-			}
+			Class[] otherTypes = method.getParameterTypes();
 			boolean match = true;
 			int score = 0;
 			for (int ii = 0, nn = parameterTypes.length; ii < nn; ii++) {
-				Class<?> type = parameterTypes[ii];
-				Class<?> otherType = otherTypes[ii];
+				Class type = parameterTypes[ii];
+				Class otherType = otherTypes[ii];
 
 				if (!otherType.isAssignableFrom(type)) {
 					score++;
@@ -215,9 +171,6 @@ public class JavaReflection extends Reflection {
 							score++;
 						}
 					}
-				}else if(type == null && otherType.isPrimitive()){
-					match = false;
-					break;
 				}
 			}
 			if (match) {
@@ -234,26 +187,11 @@ public class JavaReflection extends Reflection {
 		}
 		return foundMethod;
 	}
-	
-	/** Returns the method best matching the given signature, including type coercion, or null. **/
-	private static Method findMethod (Class<?> cls, String name, Class<?>[] parameterTypes) {
-		Method[] methods = cls.getDeclaredMethods();
-		List<Method> methodList = new ArrayList<>();
-		for (int i = 0, n = methods.length; i < n; i++) {
-			Method method = methods[i];
-
-			// if neither name or parameter list size match, bail on this method
-			if (!method.getName().equals(name)) continue;
-			if (method.getParameterTypes().length != parameterTypes.length) continue;
-			methodList.add(method);
-		}
-		return findMethod(methodList,parameterTypes);
-	}
 
 	/** Returns whether the from type can be assigned to the to type, assuming either type is a (boxed) primitive type. We can
 	 * relax the type constraint a little, as we'll invoke a method via reflection. That means the from type will always be boxed,
 	 * as the {@link Method#invoke(Object, Object...)} method takes objects. **/
-	private static boolean isPrimitiveAssignableFrom (Class<?> from, Class<?> to) {
+	private static boolean isPrimitiveAssignableFrom (Class from, Class to) {
 		if ((from == Boolean.class || from == boolean.class) && (to == boolean.class || to == Boolean.class)) return true;
 		if ((from == Integer.class || from == int.class) && (to == int.class || to == Integer.class)) return true;
 		if ((from == Float.class || from == float.class) && (to == float.class || to == Float.class)) return true;
@@ -264,21 +202,10 @@ public class JavaReflection extends Reflection {
 		if ((from == Character.class || from == char.class) && (to == char.class || to == Character.class)) return true;
 		return false;
 	}
-	
-	public static String[] getStringTypes(Object[] objects){
-		String[] parameterTypes = new String[objects == null ? 0: objects.length];
-		if(objects != null){
-			for(int i=0,len = objects.length;i<len;i++){
-				Object value = objects[i];
-				parameterTypes[i] = value == null ? "null" : value.getClass().getSimpleName();  
-			}
-		}
-		return parameterTypes;
-	}
 
 	/** Returns whether the from type can be coerced to the to type. The coercion rules follow those of Java. See JLS 5.1.2
 	 * https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html **/
-	private static boolean isCoercible (Class<?> from, Class<?> to) {
+	private static boolean isCoercible (Class from, Class to) {
 		if (from == Integer.class || from == int.class) {
 			return to == float.class || to == Float.class || to == double.class || to == Double.class || to == long.class || to == Long.class;
 		}
@@ -309,11 +236,7 @@ public class JavaReflection extends Reflection {
 		if (from == Long.class || from == long.class) {
 			return to == float.class || to == Float.class || to == double.class || to == Double.class;
 		}
-		
-		if(from == int[].class || from == Integer[].class){
-			return to == Object[].class || to == float[].class || to == Float[].class || to == double[].class || to == Double[].class || to == long[].class || to == Long[].class;
-		}
-		
+
 		return false;
 	}
 
@@ -361,5 +284,26 @@ public class JavaReflection extends Reflection {
 			if (!Arrays.equals(parameters, other.parameters)) return false;
 			return true;
 		}
+
+		public void registerExtensionClass(Class<?> target,Class<?> clazz){
+			Method[] methods = clazz.getDeclaredMethods();
+			if(methods != null){
+				Map<String, List<Method>> cachedMethodMap = extensionmethodCache.get(target);
+				if(cachedMethodMap == null){
+					cachedMethodMap = new HashMap<>();
+					extensionmethodCache.put(target,cachedMethodMap);
+				}
+				for (Method method : methods) {
+					if(Modifier.isStatic(method.getModifiers()) && method.getParameterCount() > 0){
+						List<Method> cachedList = cachedMethodMap.get(method.getName());
+						if(cachedList == null){
+							cachedList = new ArrayList<>();
+							cachedMethodMap.put(method.getName(), cachedList);
+						}
+						cachedList.add(method);
+					}
+				}
+			}
+		}	
 	}
 }

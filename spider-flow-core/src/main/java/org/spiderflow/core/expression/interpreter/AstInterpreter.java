@@ -2,15 +2,18 @@
 package org.spiderflow.core.expression.interpreter;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
-import org.spiderflow.core.expression.ExpressionError;
-import org.spiderflow.core.expression.ExpressionError.TemplateException;
-import org.spiderflow.core.expression.ExpressionTemplate;
-import org.spiderflow.core.expression.ExpressionTemplateContext;
+import org.spiderflow.core.expression.Error.TemplateException;
+import org.spiderflow.core.expression.Template;
+import org.spiderflow.core.expression.TemplateContext;
 import org.spiderflow.core.expression.parsing.Ast;
+import org.spiderflow.core.expression.parsing.Ast.Break;
+import org.spiderflow.core.expression.parsing.Ast.Continue;
 import org.spiderflow.core.expression.parsing.Ast.Node;
-import org.spiderflow.core.expression.parsing.Ast.Text;
+import org.spiderflow.core.expression.parsing.Ast.Return;
+import org.spiderflow.core.expression.parsing.Ast.Return.ReturnValue;
 
 /**
  * <p>
@@ -20,48 +23,44 @@ import org.spiderflow.core.expression.parsing.Ast.Text;
  * </p>
  *
  * <p>
- * The interpeter traverses the AST as stored in {@link ExpressionTemplate#getNodes()}. the interpeter has a method for each AST node type
+ * The interpeter traverses the AST as stored in {@link Template#getNodes()}. the interpeter has a method for each AST node type
  * (see {@link Ast} that evaluates that node. A node may return a value, to be used in the interpretation of a parent node or to
  * be written to the output stream.
  * </p>
  **/
 public class AstInterpreter {
-	public static Object interpret (ExpressionTemplate template, ExpressionTemplateContext context) {
+	public static Object interpret (Template template, TemplateContext context, OutputStream out) {
 		try {
-			return interpretNodeList(template.getNodes(), template, context);
+			Object result = interpretNodeList(template.getNodes(), template, context, out);
+			if (result == Return.RETURN_SENTINEL) {
+				return ((ReturnValue)result).getValue();
+			} else {
+				return null;
+			}
 		} catch (Throwable t) {
 			if (t instanceof TemplateException)
 				throw (TemplateException)t;
 			else {
-				ExpressionError.error("Executing expression errors " + t.getMessage(), template.getNodes().get(0).getSpan(),t);
+				org.spiderflow.core.expression.Error.error("Couldn't interpret node list due to I/O error, " + t.getMessage(), template.getNodes().get(0).getSpan());
 				return null; // never reached
 			}
-		} 
+		} finally {
+			// clear out RETURN_SENTINEL as it uses a ThreadLocal and would leak memory otherwise
+			Return.RETURN_SENTINEL.setValue(null);
+		}
 	}
 
-	public static Object interpretNodeList (List<Node> nodes, ExpressionTemplate template, ExpressionTemplateContext context) throws IOException {
-		String result = "";
+	public static Object interpretNodeList (List<Node> nodes, Template template, TemplateContext context, OutputStream out) throws IOException {
 		for (int i = 0, n = nodes.size(); i < n; i++) {
 			Node node = nodes.get(i);
-			Object value = node.evaluate(template, context);
-			if(node instanceof Text){
-				result += node.getSpan().getText();
-			}else if(value == null){
-				if(i ==	 0 && i + 1 == n){
-					return null;
-				}
-				result += "null";
-			}else if(value instanceof String || value instanceof Number || value instanceof Boolean){
-				if(i ==0 && i + 1 ==n){
+			Object value = node.evaluate(template, context, out);
+			if (value != null) {
+				if (value == Break.BREAK_SENTINEL || value == Continue.CONTINUE_SENTINEL || value == Return.RETURN_SENTINEL)
 					return value;
-				}
-				result += value;
-			}else if(i + 1 < n){
-				ExpressionError.error("The expression to evaluate", node.getSpan());
-			}else{
-				return value;
+				else
+					out.write(value.toString().getBytes("UTF-8"));
 			}
 		}
-		return result;
+		return null;
 	}
 }

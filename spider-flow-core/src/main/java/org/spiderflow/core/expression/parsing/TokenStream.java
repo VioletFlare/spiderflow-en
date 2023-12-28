@@ -3,10 +3,8 @@ package org.spiderflow.core.expression.parsing;
 
 import java.util.List;
 
-import javax.xml.transform.Source;
-
-import org.spiderflow.core.expression.ExpressionError;
-
+import org.spiderflow.core.expression.Error;
+import org.spiderflow.core.expression.TemplateLoader.Source;
 
 /** Iterates over a list of {@link Token} instances, provides methods to match expected tokens and throw errors in case of a
  * mismatch. */
@@ -25,31 +23,11 @@ public class TokenStream {
 	public boolean hasMore () {
 		return index < end;
 	}
-	
-	public boolean hasNext(){
-		return index + 1 < end;
-	}
-	
-	public boolean hasPrev(){
-		return index > 0;
-	}
 
 	/** Consumes the next token and returns it. **/
 	public Token consume () {
 		if (!hasMore()) throw new RuntimeException("Reached the end of the source.");
 		return tokens.get(index++);
-	}
-	
-	public Token next(){
-		if (!hasMore()) throw new RuntimeException("Reached the end of the source.");
-		return tokens.get(++index);
-	}
-	
-	public Token prev(){
-		if(index == 0){
-			throw new RuntimeException("Reached the end of the source.");
-		}
-		return tokens.get(--index);
 	}
 
 	/** Checks if the next token has the give type and optionally consumes, or throws an error if the next token did not match the
@@ -60,9 +38,9 @@ public class TokenStream {
 			Token token = index < tokens.size() ? tokens.get(index) : null;
 			Span span = token != null ? token.getSpan() : null;
 			if (span == null)
-				ExpressionError.error("Expected '" + type.getError() + "', but reached the end of the source.", this);
+				Error.error("Expected '" + type.getError() + "', but reached the end of the source.", this);
 			else
-				ExpressionError.error("Expected '" + type.getError() + "', but got '" + token.getText() + "'", span);
+				Error.error("Expected '" + type.getError() + "', but got '" + token.getText() + "'", span);
 			return null; // never reached
 		} else {
 			return tokens.get(index - 1);
@@ -77,9 +55,9 @@ public class TokenStream {
 			Token token = index < tokens.size() ? tokens.get(index) : null;
 			Span span = token != null ? token.getSpan() : null;
 			if (span == null)
-				ExpressionError.error("Expected '" + text + "', but reached the end of the source.", this);
+				Error.error("Expected '" + text + "', but reached the end of the source.", this);
 			else
-				ExpressionError.error("Expected '" + text + "', but got '" + token.getText() + "'", span);
+				Error.error("Expected '" + text + "', but got '" + token.getText() + "'", span);
 			return null; // never reached
 		} else {
 			return tokens.get(index - 1);
@@ -125,7 +103,7 @@ public class TokenStream {
 	}
 
 	/** Returns the {@link Source} this stream wraps. */
-	public String getSource () {
+	public Source getSource () {
 		if (tokens.size() == 0) return null;
 		return tokens.get(0).getSpan().getSource();
 	}

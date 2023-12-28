@@ -24,10 +24,6 @@ public abstract class Reflection {
 	 * null if the method could not be found. If obj is an instance of Class, the matching static method is returned. If the name
 	 * is null and the object is a {@link FunctionalInterface}, the first declared method on the object is returned. **/
 	public abstract Object getMethod (Object obj, String name, Object... arguments);
-	
-	public abstract Object getExtensionMethod (Object obj, String name,Object ... arguments);
-	
-	public abstract void registerExtensionClass(Class<?> target,Class<?> clazz);
 
 	/** Returns the value of the field from the object. The field must have been previously retrieved via
 	 * {@link #getField(Object, String)}. **/
@@ -36,4 +32,6 @@ public abstract class Reflection {
 	/** Calls the method on the object with the given arguments. The method must have been previously retrieved via
 	 * {@link #getMethod(Object, String, Object...)}. **/
 	public abstract Object callMethod (Object obj, Object method, Object... arguments);
+
+	public abstract void registerExtensionClass(Class<?> target,Class<?> clazz);
 }

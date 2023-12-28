@@ -18,7 +18,6 @@ public enum TokenType {
 	Minus("-", "-"),
 	Asterisk("*", "*"),
 	ForwardSlash("/", "/"),
-	PostSlash("\\", "\\"),
 	Percentage("%", "%"),
 	LeftParantheses("(", ")"),
 	RightParantheses(")", ")"),
@@ -39,7 +38,7 @@ public enum TokenType {
 	Not("!", "!"),
 	Questionmark("?", "?"),
 	DoubleQuote("\"", "\""),
-	SingleQuote("'", "'"),
+	Backtick("`", "`"),
 	BooleanLiteral("true or false"),
 	DoubleLiteral("a double floating point number"),
 	FloatLiteral("a floating point number"),
@@ -49,6 +48,7 @@ public enum TokenType {
 	ByteLiteral("a byte integer number"),
 	CharacterLiteral("a character"),
 	StringLiteral("a string"),
+	RawStringLiteral("a string"),
 	NullLiteral("null"),
 	Identifier("an identifier");
 	// @on

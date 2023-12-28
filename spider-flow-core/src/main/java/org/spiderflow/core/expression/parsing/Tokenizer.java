@@ -4,48 +4,32 @@ package org.spiderflow.core.expression.parsing;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.spiderflow.core.expression.ExpressionError;
-import org.spiderflow.core.expression.ExpressionError.StringLiteralException;
-import org.spiderflow.core.expression.ExpressionError.TemplateException;
-
+import org.spiderflow.core.expression.Error;
+import org.spiderflow.core.expression.TemplateLoader.Source;
 
 public class Tokenizer {
 
 	/** Tokenizes the source into tokens with a {@link TokenType}. Text blocks not enclosed in {{ }} are returned as a single token
 	 * of type {@link TokenType.TextBlock}. {{ and }} are not returned as individual tokens. See {@link TokenType} for the list of
 	 * tokens this tokenizer understands. */
-	public List<Token> tokenize (String source) {
+	public List<Token> tokenize (Source source) {
 		List<Token> tokens = new ArrayList<Token>();
-		if (source.length() == 0) return tokens;
+		if (source.getContent().length() == 0) return tokens;
 		CharacterStream stream = new CharacterStream(source);
 		stream.startSpan();
 
-		RuntimeException re = null;
+		// TODO: this will fall on its face if we have something like {{ "}}" }}.
 		while (stream.hasMore()) {
-			if (stream.match("${", false)) {
+			if (stream.match("\\{", true)) {
+				// NOP
+			} else if(stream.match("{{", false)) {
 				if (!stream.isSpanEmpty()) tokens.add(new Token(TokenType.TextBlock, stream.endSpan()));
 				stream.startSpan();
-				boolean isContinue = false;
-				do{
-					while (!stream.match("}", true)) {
-						if (!stream.hasMore()) ExpressionError.error("Did not find closing }.", stream.endSpan());
-						stream.consume();
-					}
-					try{
-						tokens.addAll(tokenizeCodeSpan(stream.endSpan()));
-						isContinue = false;
-						re = null;
-					}catch(TemplateException e){
-						re = e;
-						if(e.getCause() != null || stream.hasMore()){
-							isContinue = true;
-						}
-					}
-					
-				}while(isContinue);
-				if(re != null){
-					throw re;
+				while (!stream.match("}}", true)) {
+					if (!stream.hasMore()) Error.error("Did not find closing }}.", stream.endSpan());
+					stream.consume();
 				}
+				tokens.addAll(tokenizeCodeSpan(stream.endSpan()));
 				stream.startSpan();
 			} else {
 				stream.consume();
@@ -56,14 +40,13 @@ public class Tokenizer {
 	}
 
 	private static List<Token> tokenizeCodeSpan (Span span) {
-		String source = span.getSource();
+		Source source = span.getSource();
 		CharacterStream stream = new CharacterStream(source, span.getStart(), span.getEnd());
 		List<Token> tokens = new ArrayList<Token>();
 
 		// match opening tag and throw it away
-		if (!stream.match("${", true)) ExpressionError.error("Expected ${", new Span(source, stream.getPosition(), stream.getPosition() + 1));
-		int leftCount = 0;
-		int rightCount = 0;
+		if (!stream.match("{{", true)) Error.error("Expected {{", new Span(source, stream.getPosition(), stream.getPosition() + 1));
+
 		outer:
 		while (stream.hasMore()) {
 			// skip whitespace
@@ -80,18 +63,18 @@ public class Tokenizer {
 					while (stream.matchDigit(true))
 						;
 				}
-				if (stream.match("b", true) || stream.match("B", true)) {
-					if (type == TokenType.FloatLiteral) ExpressionError.error("Byte literal can not have a decimal point.", stream.endSpan());
+				if (stream.match("b", true)) {
+					if (type == TokenType.FloatLiteral) Error.error("Byte literal can not have a decimal point.", stream.endSpan());
 					type = TokenType.ByteLiteral;
-				} else if (stream.match("s", true) || stream.match("S", true)) {
-					if (type == TokenType.FloatLiteral) ExpressionError.error("Short literal can not have a decimal point.", stream.endSpan());
+				} else if (stream.match("s", true)) {
+					if (type == TokenType.FloatLiteral) Error.error("Short literal can not have a decimal point.", stream.endSpan());
 					type = TokenType.ShortLiteral;
-				} else if (stream.match("l", true) || stream.match("L", true)) {
-					if (type == TokenType.FloatLiteral) ExpressionError.error("Long literal can not have a decimal point.", stream.endSpan());
+				} else if (stream.match("l", true)) {
+					if (type == TokenType.FloatLiteral) Error.error("Long literal can not have a decimal point.", stream.endSpan());
 					type = TokenType.LongLiteral;
-				} else if (stream.match("f", true) || stream.match("F", true)) {
+				} else if (stream.match("f", true)) {
 					type = TokenType.FloatLiteral;
-				} else if (stream.match("d", true) || stream.match("D", true)) {
+				} else if (stream.match("d", true)) {
 					type = TokenType.DoubleLiteral;
 				}
 				Span numberSpan = stream.endSpan();
@@ -99,25 +82,16 @@ public class Tokenizer {
 				continue;
 			}
 
-			// String literal
-			if (stream.match(TokenType.SingleQuote.getLiteral(), true)) {
+			// Character literal
+			if (stream.match("'", false)) {
 				stream.startSpan();
-				boolean matchedEndQuote = false;
-				while (stream.hasMore()) {
-					// Note: escape sequences like \n are parsed in StringLiteral
-					if (stream.match("\\", true)) {
-						stream.consume();
-					}
-					if (stream.match(TokenType.SingleQuote.getLiteral(), true)) {
-						matchedEndQuote = true;
-						break;
-					}
-					stream.consume();
-				}
-				if (!matchedEndQuote) ExpressionError.error("String doesn't end with a semicolon\'", stream.endSpan(),new StringLiteralException());
-				Span stringSpan = stream.endSpan();
-				stringSpan = new Span(stringSpan.getSource(), stringSpan.getStart() - 1, stringSpan.getEnd());
-				tokens.add(new Token(TokenType.StringLiteral, stringSpan));
+				stream.consume();
+				// Note: escape sequences are parsed in CharacterLiteral
+				stream.match("\\", true);
+				stream.consume();
+				if (!stream.match("'", true)) Error.error("Expected closing ' for character literal.", stream.endSpan());
+				Span literalSpan = stream.endSpan();
+				tokens.add(new Token(TokenType.CharacterLiteral, literalSpan));
 				continue;
 			}
 
@@ -136,13 +110,35 @@ public class Tokenizer {
 					}
 					stream.consume();
 				}
-				if (!matchedEndQuote) ExpressionError.error("String doesn't end with a semicolon\"", stream.endSpan(),new StringLiteralException());
+				if (!matchedEndQuote) Error.error("String literal is not closed by double quote", stream.endSpan());
 				Span stringSpan = stream.endSpan();
 				stringSpan = new Span(stringSpan.getSource(), stringSpan.getStart() - 1, stringSpan.getEnd());
 				tokens.add(new Token(TokenType.StringLiteral, stringSpan));
 				continue;
 			}
-			
+
+				// String literal backtick
+				if (stream.match(TokenType.Backtick.getLiteral(), true)) {
+					stream.startSpan();
+					boolean matchedEndQuote = false;
+					while (stream.hasMore()) {
+						// Note: escape sequences like \n are parsed in StringLiteral
+						if (stream.match("\\", true)) {
+							stream.consume();
+						}
+						if (stream.match(TokenType.Backtick.getLiteral(), true)) {
+							matchedEndQuote = true;
+							break;
+						}
+						stream.consume();
+					}
+					if (!matchedEndQuote) Error.error("String literal is not closed by double quote", stream.endSpan());
+					Span stringSpan = stream.endSpan();
+					stringSpan = new Span(stringSpan.getSource(), stringSpan.getStart() - 1, stringSpan.getEnd());
+					tokens.add(new Token(TokenType.RawStringLiteral, stringSpan));
+					continue;
+				}
+
 			// Identifier, keyword, boolean literal, or null literal
 			if (stream.matchIdentifierStart(true)) {
 				stream.startSpan();
@@ -165,27 +161,28 @@ public class Tokenizer {
 			for (TokenType t : TokenType.getSortedValues()) {
 				if (t.getLiteral() != null) {
 					if (stream.match(t.getLiteral(), true)) {
-						if(t == TokenType.LeftCurly){
-							leftCount ++;
-						}
 						tokens.add(new Token(t, new Span(source, stream.getPosition() - t.getLiteral().length(), stream.getPosition())));
 						continue outer;
 					}
 				}
 			}
-			if(leftCount!=rightCount&&stream.match("}", true)){
-				rightCount++;
-				tokens.add(new Token(TokenType.RightCurly, new Span(source, stream.getPosition() - 1, stream.getPosition())));
-				continue outer;
-			}
-			// match closing tag
-			if (stream.match("}", false)) break;
 
-			ExpressionError.error("Unknown token", new Span(source, stream.getPosition(), stream.getPosition() + 1));
+			// match closing tag
+			if (stream.match("}}", false)) break;
+
+			// single right curly for object literals
+			if (stream.match("}", false)) {
+				stream.startSpan();
+				stream.match("}", true);
+				tokens.add(new Token(TokenType.RightCurly, stream.endSpan()));
+				continue;
+			}
+
+			Error.error("Unknown token", new Span(source, stream.getPosition(), stream.getPosition() + 1));
 		}
 
-		// code spans must end with }
-		if (!stream.match("}", true)) ExpressionError.error("Expected }", new Span(source, stream.getPosition(), stream.getPosition() + 1));
+		// code spans must end with }}
+		if (!stream.match("}}", true)) Error.error("Expected }}", new Span(source, stream.getPosition(), stream.getPosition() + 1));
 		return tokens;
 	}
 }
